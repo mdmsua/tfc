@@ -22,7 +22,9 @@ terraform {
   }
 }
 
-provider "tfe" {}
+provider "tfe" {
+  organization = "dmmo"
+}
 
 provider "azurerm" {
   features {}
