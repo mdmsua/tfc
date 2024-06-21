@@ -11,7 +11,7 @@ resource "tfe_agent_token" "main" {
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~> 0.4"
-  suffix  = ["tfc"]
+  suffix  = ["tfc", "gwc", "dev"]
 }
 
 resource "azurerm_resource_group" "main" {
