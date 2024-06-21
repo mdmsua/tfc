@@ -17,3 +17,9 @@ variable "image" {
   description = "Agent image"
   default     = "ghcr.io/cariad-mega/tfc-agent:main"
 }
+
+variable "image_registry_password" {
+  type        = string
+  description = "Image registry password"
+  sensitive   = true
+}

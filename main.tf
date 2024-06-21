@@ -74,5 +74,6 @@ resource "azurerm_container_group" "main" {
   image_registry_credential {
     server   = split("/", var.image)[0]
     username = split("/", var.image)[1]
+    password = var.image_registry_password
   }
 }
