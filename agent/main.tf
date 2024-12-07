@@ -6,8 +6,8 @@ data "azurerm_subscription" "main" {
 }
 
 data "azurerm_container_registry" "main" {
-  name                = split("/", data.azurerm_client_config.main.subscription_id)[0]
-  resource_group_name = split("/", data.azurerm_client_config.main.subscription_id)[0]
+  name                = split("-", data.azurerm_client_config.main.subscription_id)[0]
+  resource_group_name = split("-", data.azurerm_client_config.main.subscription_id)[0]
 }
 
 resource "tfe_agent_pool" "main" {

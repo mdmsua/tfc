@@ -1,7 +1,7 @@
 data "azurerm_client_config" "main" {}
 
 data "azurerm_resource_group" "main" {
-  name = split("/", data.azurerm_client_config.main.subscription_id)[0]
+  name = split("-", data.azurerm_client_config.main.subscription_id)[0]
 }
 
 resource "azurerm_container_registry" "main" {
