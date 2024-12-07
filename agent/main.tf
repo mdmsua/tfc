@@ -11,8 +11,8 @@ data "azurerm_container_registry" "main" {
 }
 
 resource "tfe_agent_pool" "main" {
-  name                = "Azure"
-  organization_scoped = true
+  name         = "Azure"
+  organization = "dmmo"
 }
 
 resource "tfe_agent_token" "main" {
@@ -71,7 +71,7 @@ resource "azurerm_container_group" "main" {
 
   container {
     name   = "agent"
-    image  = "tfc-agent:latest"
+    image  = "${data.azurerm_container_registry.main.login_server}/tfc-agent:latest"
     cpu    = 1
     memory = 1
 
