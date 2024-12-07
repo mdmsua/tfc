@@ -28,8 +28,9 @@ resource "azurerm_container_registry_task" "main" {
     context_access_token = var.github_token
     image_names          = ["tfc-agent:latest"]
   }
-}
 
-resource "azurerm_container_registry_task_schedule_run_now" "main" {
-  container_registry_task_id = azurerm_container_registry_task.main.id
+  timer_trigger {
+    name     = "daily"
+    schedule = "0 0 * * *"
+  }
 }

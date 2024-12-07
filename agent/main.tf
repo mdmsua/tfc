@@ -37,19 +37,19 @@ resource "azurerm_user_assigned_identity" "main" {
   location            = azurerm_resource_group.main.location
 }
 
-resource "azurerm_role_assignment" "agent_subscription_owner" {
+resource "azurerm_role_assignment" "subscription_owner" {
   role_definition_name = "Owner"
   principal_id         = azurerm_user_assigned_identity.main.principal_id
   scope                = data.azurerm_subscription.main.id
 }
 
-resource "azurerm_role_assignment" "agent_cluster_admin" {
+resource "azurerm_role_assignment" "cluster_admin" {
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
   principal_id         = azurerm_user_assigned_identity.main.principal_id
   scope                = data.azurerm_subscription.main.id
 }
 
-resource "azurerm_role_assignment" "agent_acr_pull" {
+resource "azurerm_role_assignment" "acr_pull" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.main.principal_id
   scope                = data.azurerm_container_registry.main.id
@@ -94,5 +94,5 @@ resource "azurerm_container_group" "main" {
     user_assigned_identity_id = azurerm_user_assigned_identity.main.id
   }
 
-  depends_on = [azurerm_role_assignment.agent_acr_pull]
+  depends_on = [azurerm_role_assignment.acr_pull]
 }
