@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.96.2
+    hooks:
+      - id: terraform_fmt
+        args:
+          - --args=-recursive
+      - id: terraform_tflint
+        args:
+          - --args=--recursive
+          - --args=--fix
+      - id: terraform_validate
+        args:
+          - --hook-config=--parallelism-limit=1
+          - --tf-init-args=-upgrade
+      # - id: terraform_providers_lock
+      #   args:
+      #     - --hook-config=--mode=always-regenerate-lockfile
+      #     - --args=-platform=linux_amd64

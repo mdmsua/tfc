@@ -11,15 +11,3 @@ variable "tfc_azure_dynamic_credentials" {
     }))
   })
 }
-
-variable "image" {
-  type        = string
-  description = "Agent image"
-  default     = "ghcr.io/mdmsua/tfc-agent:main"
-}
-
-variable "image_registry_password" {
-  type        = string
-  description = "Image registry password"
-  sensitive   = true
-}

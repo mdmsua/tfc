@@ -1,3 +1,15 @@
+
+data "azurerm_client_config" "main" {}
+
+data "azurerm_subscription" "main" {
+  subscription_id = data.azurerm_client_config.main.subscription_id
+}
+
+data "azurerm_container_registry" "main" {
+  name                = split("/", data.azurerm_client_config.main.subscription_id)[0]
+  resource_group_name = split("/", data.azurerm_client_config.main.subscription_id)[0]
+}
+
 resource "tfe_agent_pool" "main" {
   name                = "Azure"
   organization_scoped = true
@@ -10,7 +22,7 @@ resource "tfe_agent_token" "main" {
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "~> 0.4"
+  version = "~> 0.4.0"
   suffix  = ["tfc", "gwc", "dev"]
 }
 
@@ -37,6 +49,12 @@ resource "azurerm_role_assignment" "agent_cluster_admin" {
   scope                = data.azurerm_subscription.main.id
 }
 
+resource "azurerm_role_assignment" "agent_acr_pull" {
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+  scope                = data.azurerm_container_registry.main.id
+}
+
 resource "azurerm_container_group" "main" {
   name                = module.naming.container_group.name
   resource_group_name = azurerm_resource_group.main.name
@@ -53,7 +71,7 @@ resource "azurerm_container_group" "main" {
 
   container {
     name   = "agent"
-    image  = var.image
+    image  = "tfc-agent:latest"
     cpu    = 1
     memory = 1
 
@@ -72,8 +90,9 @@ resource "azurerm_container_group" "main" {
   }
 
   image_registry_credential {
-    server   = split("/", var.image)[0]
-    username = split("/", var.image)[1]
-    password = var.image_registry_password
+    server                    = data.azurerm_container_registry.main.login_server
+    user_assigned_identity_id = azurerm_user_assigned_identity.main.id
   }
+
+  depends_on = [azurerm_role_assignment.agent_acr_pull]
 }
