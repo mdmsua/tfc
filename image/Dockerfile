@@ -4,7 +4,7 @@ USER root
 
 ARG KUBELOGIN_VERSION=0.1.5
 
-ADD https://github.com/Azure/kubelogin/releases/download/v{KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip /tmp/kubelogin.zip
+ADD https://github.com/Azure/kubelogin/releases/download/v${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip /tmp/kubelogin.zip
 
 RUN apt-get install -y unzip && \
     unzip /tmp/kubelogin.zip -d /tmp && \
