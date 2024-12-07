@@ -29,3 +29,7 @@ resource "azurerm_container_registry_task" "main" {
     image_names          = ["tfc-agent:latest"]
   }
 }
+
+resource "azurerm_container_registry_task_schedule_run_now" "main" {
+  container_registry_task_id = azurerm_container_registry_task.main.id
+}
