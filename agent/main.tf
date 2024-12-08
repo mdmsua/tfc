@@ -11,8 +11,7 @@ data "azurerm_container_registry" "main" {
 }
 
 resource "tfe_agent_pool" "main" {
-  name         = "Azure"
-  organization = "dmmo"
+  name = "Azure"
 }
 
 resource "tfe_agent_token" "main" {
