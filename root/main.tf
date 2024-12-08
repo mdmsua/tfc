@@ -29,7 +29,7 @@ resource "tfe_workspace" "main" {
 
   vcs_repo {
     identifier                 = "mdmsua/tfc"
-    github_app_installation_id = 42695319
+    github_app_installation_id = "42695319"
   }
 }
 
