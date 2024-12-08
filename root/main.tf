@@ -14,6 +14,10 @@ data "azuread_client_config" "main" {}
 
 data "tfe_organization" "main" {}
 
+data "tfe_github_app_installation" "main" {
+  installation_id = 42695319
+}
+
 data "azuread_application" "main" {
   client_id = data.azuread_client_config.main.client_id
 }
@@ -29,7 +33,7 @@ resource "tfe_workspace" "main" {
 
   vcs_repo {
     identifier                 = "mdmsua/tfc"
-    github_app_installation_id = "42695319"
+    github_app_installation_id = data.tfe_github_app_installation.main.id
   }
 }
 
