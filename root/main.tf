@@ -56,3 +56,10 @@ resource "azuread_application_federated_identity_credential" "apply" {
   issuer         = "https://app.terraform.io"
   subject        = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:apply"
 }
+
+removed {
+  from = azurerm_resource_group.main
+  lifecycle {
+    destroy = false
+  }
+}
