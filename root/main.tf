@@ -85,7 +85,6 @@ resource "tfe_variable_set" "main" {
   for_each          = local.workspaces
   name              = title(each.key)
   parent_project_id = data.tfe_project.main.id
-  organization      = data.tfe_project.main.name
   workspace_ids     = [tfe_workspace.main[each.key].id]
 }
 
