@@ -3,7 +3,7 @@ terraform {
   cloud {
     organization = "dmmo"
     workspaces {
-      name = "trafiman"
+      name = "flux"
     }
   }
   required_providers {
