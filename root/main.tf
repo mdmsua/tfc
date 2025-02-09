@@ -1,5 +1,10 @@
 locals {
   workspaces = { for f in fileset("${path.module}/workspaces", "*.yaml") : trimsuffix(f, ".yaml") => yamldecode(file("${path.module}/workspaces/${f}")) }
+
+  resource_providers = {
+    "Microsoft.ContainerService" = ["EnableAPIServerVnetIntegrationPreview", "AzureOverlayDualStackPreview"]
+    "Microsoft.Compute"          = ["EncryptionAtHost"]
+  }
 }
 
 data "tfe_agent_pool" "main" {
@@ -89,4 +94,17 @@ resource "tfe_variable" "main" {
   value        = azurerm_user_assigned_identity.main[each.key].client_id
   workspace_id = tfe_workspace.main[each.key].id
   category     = "env"
+}
+
+resource "azurerm_resource_provider_registration" "main" {
+  for_each = local.resource_providers
+  name     = each.key
+
+  dynamic "feature" {
+    for_each = toset(each.value)
+    content {
+      name       = feature.value
+      registered = true
+    }
+  }
 }

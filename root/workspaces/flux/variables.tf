@@ -11,3 +11,9 @@ variable "tfc_azure_dynamic_credentials" {
     }))
   })
 }
+
+variable "principals" {
+  description = "Cluster admin principals"
+  type        = set(string)
+  default     = ["6b1aa092-b266-49f3-be05-341fff39cd59"]
+}
