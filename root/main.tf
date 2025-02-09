@@ -12,10 +12,6 @@ data "tfe_project" "main" {
 
 data "tfe_organization" "main" {}
 
-data "tfe_github_app_installation" "main" {
-  name = "GitHub"
-}
-
 data "azurerm_client_config" "main" {}
 
 resource "tfe_workspace" "main" {
@@ -28,8 +24,9 @@ resource "tfe_workspace" "main" {
   working_directory              = "root/workspaces/${each.key}"
 
   vcs_repo {
-    identifier                 = "mdmsua/tfc"
-    github_app_installation_id = data.tfe_github_app_installation.main.id
+    identifier     = "mdmsua/tfc"
+    branch         = "main"
+    oauth_token_id = "ot-LtULrZJ8rQraLxoj"
   }
 }
 
