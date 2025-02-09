@@ -84,9 +84,18 @@ resource "azurerm_role_assignment" "main" {
   role_definition_name = "Owner"
 }
 
-removed {
-  from = azurerm_resource_group.main
-  lifecycle {
-    destroy = false
-  }
+resource "tfe_variable_set" "main" {
+  for_each          = local.workspaces
+  name              = title(each.key)
+  parent_project_id = data.tfe_project.main.id
+  organization      = data.tfe_project.main.name
+  workspace_ids     = [tfe_workspace.main[each.key].id]
+}
+
+resource "tfe_variable" "main" {
+  for_each        = local.workspaces
+  variable_set_id = tfe_variable_set.main[each.key].id
+  key             = "ARM_CLIENT_ID"
+  value           = azurerm_user_assigned_identity.main[each.key].client_id
+  category        = "env"
 }
