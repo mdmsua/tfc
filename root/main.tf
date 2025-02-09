@@ -22,6 +22,8 @@ resource "tfe_workspace" "main" {
   auto_apply_run_trigger         = true
   auto_destroy_activity_duration = "6h"
   working_directory              = "root/workspaces/${each.key}"
+  terraform_version              = "~> 1.10.0"
+  auto_apply                     = true
 
   vcs_repo {
     identifier     = "mdmsua/tfc"
@@ -81,17 +83,10 @@ resource "azurerm_role_assignment" "main" {
   role_definition_name = "Owner"
 }
 
-resource "tfe_variable_set" "main" {
-  for_each          = local.workspaces
-  name              = title(each.key)
-  parent_project_id = data.tfe_project.main.id
-  workspace_ids     = [tfe_workspace.main[each.key].id]
-}
-
 resource "tfe_variable" "main" {
-  for_each        = local.workspaces
-  variable_set_id = tfe_variable_set.main[each.key].id
-  key             = "ARM_CLIENT_ID"
-  value           = azurerm_user_assigned_identity.main[each.key].client_id
-  category        = "env"
+  for_each     = local.workspaces
+  key          = "ARM_CLIENT_ID"
+  value        = azurerm_user_assigned_identity.main[each.key].client_id
+  workspace_id = tfe_workspace.main[each.key].id
+  category     = "env"
 }
