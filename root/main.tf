@@ -7,10 +7,6 @@ locals {
   }
 }
 
-data "tfe_agent_pool" "main" {
-  name = "Azure"
-}
-
 data "tfe_project" "main" {
   name = "Azure"
 }
@@ -35,12 +31,6 @@ resource "tfe_workspace" "main" {
     branch         = "main"
     oauth_token_id = "ot-LtULrZJ8rQraLxoj"
   }
-}
-
-resource "tfe_workspace_settings" "main" {
-  for_each      = local.workspaces
-  workspace_id  = tfe_workspace.main[each.key].id
-  agent_pool_id = data.tfe_agent_pool.main.id
 }
 
 module "naming" {
