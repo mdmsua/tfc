@@ -10,13 +10,13 @@ data "tfe_project" "main" {
   name = "Azure"
 }
 
-data "azuread_client_config" "main" {}
-
 data "tfe_organization" "main" {}
 
-data "azuread_application" "main" {
-  client_id = data.azuread_client_config.main.client_id
+data "tfe_github_app_installation" "main" {
+  name = "GitHub"
 }
+
+data "azurerm_client_config" "main" {}
 
 resource "tfe_workspace" "main" {
   for_each                       = local.workspaces
@@ -29,7 +29,7 @@ resource "tfe_workspace" "main" {
 
   vcs_repo {
     identifier                 = "mdmsua/tfc"
-    github_app_installation_id = "1139281"
+    github_app_installation_id = data.tfe_github_app_installation.main.id
   }
 }
 
@@ -39,22 +39,49 @@ resource "tfe_workspace_settings" "main" {
   agent_pool_id = data.tfe_agent_pool.main.id
 }
 
-resource "azuread_application_federated_identity_credential" "plan" {
-  for_each       = local.workspaces
-  display_name   = "${each.key}-plan"
-  application_id = data.azuread_application.main.id
-  audiences      = ["api://AzureADTokenExchange"]
-  issuer         = "https://app.terraform.io"
-  subject        = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:plan"
+module "naming" {
+  source  = "Azure/naming/azurerm"
+  version = "0.4.2"
+  suffix  = ["tfc", "sdc"]
 }
 
-resource "azuread_application_federated_identity_credential" "apply" {
-  for_each       = local.workspaces
-  display_name   = "${each.key}-apply"
-  application_id = data.azuread_application.main.id
-  audiences      = ["api://AzureADTokenExchange"]
-  issuer         = "https://app.terraform.io"
-  subject        = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:apply"
+resource "azurerm_resource_group" "main" {
+  name     = module.naming.resource_group.name
+  location = "swedencentral"
+}
+
+resource "azurerm_user_assigned_identity" "main" {
+  for_each            = local.workspaces
+  name                = "${module.naming.user_assigned_identity.name}-${each.key}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+}
+
+resource "azurerm_federated_identity_credential" "plan" {
+  for_each            = local.workspaces
+  name                = "${each.key}-plan"
+  resource_group_name = azurerm_user_assigned_identity.main[each.key].resource_group_name
+  parent_id           = azurerm_user_assigned_identity.main[each.key].id
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = "https://app.terraform.io"
+  subject             = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:plan"
+}
+
+resource "azurerm_federated_identity_credential" "apply" {
+  for_each            = local.workspaces
+  name                = "${each.key}-apply"
+  resource_group_name = azurerm_user_assigned_identity.main[each.key].resource_group_name
+  parent_id           = azurerm_user_assigned_identity.main[each.key].id
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = "https://app.terraform.io"
+  subject             = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:apply"
+}
+
+resource "azurerm_role_assignment" "main" {
+  for_each             = local.workspaces
+  principal_id         = azurerm_user_assigned_identity.main[each.key].principal_id
+  scope                = "/subscriptions/${data.azurerm_client_config.main.subscription_id}"
+  role_definition_name = "Owner"
 }
 
 removed {
