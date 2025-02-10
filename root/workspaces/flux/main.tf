@@ -230,7 +230,7 @@ resource "azapi_update_resource" "kube" {
 }
 
 resource "azurerm_role_assignment" "admin" {
-  for_each             = concat([data.azurerm_client_config.main.object_id], tolist(var.principals))
+  for_each             = toset(concat([data.azurerm_client_config.main.object_id], tolist(var.principals)))
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
   scope                = azurerm_kubernetes_cluster.main.id
   principal_id         = each.key
