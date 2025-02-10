@@ -133,7 +133,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 
     load_balancer_profile {
       idle_timeout_in_minutes  = 4
-      outbound_ports_allocated = 64000
+      outbound_ports_allocated = 4096
       backend_pool_type        = "NodeIP"
 
       outbound_ip_address_ids = [
