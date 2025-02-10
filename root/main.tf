@@ -98,3 +98,13 @@ resource "azurerm_resource_provider_registration" "main" {
     }
   }
 }
+
+import {
+  to = azurerm_resource_provider_registration.main["Microsoft.Compute"]
+  id = "/subscriptions/8367ce5b-3e7f-4080-8788-ed0da0e43251/providers/Microsoft.Compute"
+}
+
+import {
+  to = azurerm_resource_provider_registration.main["Microsoft.ContainerService"]
+  id = "/subscriptions/8367ce5b-3e7f-4080-8788-ed0da0e43251/providers/Microsoft.ContainerService"
+}
