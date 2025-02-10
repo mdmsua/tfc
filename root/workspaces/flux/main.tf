@@ -7,7 +7,7 @@ module "naming" {
 locals {
   network_cidrs = ["192.168.224.0/27", "fdff:646d:6d6f::/56"]
   pod_cidrs     = ["10.0.0.0/16", "fdff:646d:6d6f:100::/64"]
-  service_cidrs = ["10.0.0.0/16", "fdff:646d:6d6f:200::/108"]
+  service_cidrs = ["10.1.0.0/16", "fdff:646d:6d6f:200::/108"]
   zones         = ["1", "2", "3"]
 }
 
