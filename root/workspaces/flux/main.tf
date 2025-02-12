@@ -238,7 +238,7 @@ resource "azurerm_role_assignment" "admin" {
 
 resource "azurerm_role_assignment" "user" {
   for_each             = var.principals
-  role_definition_name = "Azure Kubernetes Service Cluster User"
+  role_definition_name = "Azure Kubernetes Service Cluster User Role"
   scope                = azurerm_kubernetes_cluster.main.id
   principal_id         = each.key
 }
