@@ -23,7 +23,7 @@ resource "tfe_workspace" "main" {
   auto_apply_run_trigger         = true
   auto_destroy_activity_duration = "6h"
   working_directory              = "root/workspaces/${each.key}"
-  terraform_version              = "~> 1.10.0"
+  terraform_version              = "~> 1.11.0"
   auto_apply                     = true
 
   vcs_repo {
@@ -97,14 +97,4 @@ resource "azurerm_resource_provider_registration" "main" {
       registered = true
     }
   }
-}
-
-import {
-  to = azurerm_resource_provider_registration.main["Microsoft.Compute"]
-  id = "/subscriptions/8367ce5b-3e7f-4080-8788-ed0da0e43251/providers/Microsoft.Compute"
-}
-
-import {
-  to = azurerm_resource_provider_registration.main["Microsoft.ContainerService"]
-  id = "/subscriptions/8367ce5b-3e7f-4080-8788-ed0da0e43251/providers/Microsoft.ContainerService"
 }
