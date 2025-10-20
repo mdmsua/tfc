@@ -2,7 +2,7 @@ FROM hashicorp/tfc-agent:latest
 
 USER root
 
-ARG KUBELOGIN_VERSION=0.1.5
+ARG KUBELOGIN_VERSION=0.2.12
 
 ADD https://github.com/Azure/kubelogin/releases/download/v${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip /tmp/kubelogin.zip
 
