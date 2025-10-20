@@ -52,10 +52,25 @@ resource "azurerm_role_assignment" "cluster_admin" {
   scope                = data.azurerm_subscription.main.id
 }
 
-resource "azurerm_role_assignment" "acr_pull" {
-  role_definition_name = "AcrPull"
-  principal_id         = azurerm_user_assigned_identity.main.principal_id
+resource "azurerm_role_assignment" "repository_reader" {
   scope                = data.azurerm_container_registry.main.id
+  role_definition_name = "Container Registry Repository Writer"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+  principal_type       = "ServicePrincipal"
+  condition_version    = "2.0"
+  condition            = <<EOF
+(
+ (
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/content/read'})
+  AND
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/metadata/read'})
+ )
+ OR 
+ (
+  @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'tfc-agent'
+ )
+)
+  EOF
 }
 
 resource "azurerm_container_group" "main" {
@@ -66,6 +81,7 @@ resource "azurerm_container_group" "main" {
   os_type             = "Linux"
   ip_address_type     = "Public"
   restart_policy      = "Always"
+  zones               = ["1", "2", "3"]
 
   identity {
     type         = "UserAssigned"
@@ -97,5 +113,5 @@ resource "azurerm_container_group" "main" {
     user_assigned_identity_id = azurerm_user_assigned_identity.main.id
   }
 
-  depends_on = [azurerm_role_assignment.acr_pull]
+  depends_on = [azurerm_role_assignment.repository_reader]
 }
