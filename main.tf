@@ -14,7 +14,7 @@ data "tfe_project" "main" {
 data "tfe_organization" "main" {}
 
 data "tfe_oauth_client" "main" {
-  oauth_client_id = "oc-KCgcDFcTwXE5Q93R"
+  oauth_client_id = "oc-oD6NMk4iCHYyEoZu"
 }
 
 data "azurerm_client_config" "main" {}
@@ -25,7 +25,7 @@ resource "tfe_workspace" "main" {
   project_id                     = data.tfe_project.main.id
   allow_destroy_plan             = true
   auto_apply_run_trigger         = true
-  auto_destroy_activity_duration = lookup(each.value, "ttl", "6h")
+  auto_destroy_activity_duration = lookup(each.value, "ttl", null)
   working_directory              = lookup(each.value, "directory", each.key)
   terraform_version              = "~> 1.13.0"
   auto_apply                     = true
