@@ -6,7 +6,7 @@ data "azurerm_subscription" "main" {
 }
 
 data "tfe_outputs" "registry" {
-  workspace = "registry"
+  workspace = "acr"
 }
 
 data "azurerm_container_registry" "main" {
