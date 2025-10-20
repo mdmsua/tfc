@@ -119,3 +119,19 @@ resource "tfe_workspace_settings" "main" {
   workspace_id   = tfe_workspace.main[each.key].id
   execution_mode = "agent"
 }
+
+resource "tfe_variable" "arm_client_id" {
+  for_each     = local.workspaces
+  key          = "ARM_CLIENT_ID"
+  value        = azurerm_user_assigned_identity.main[each.key].client_id
+  workspace_id = tfe_workspace.main[each.key].id
+  category     = "env"
+}
+
+resource "tfe_variable" "tfc_azure_run_client_id" {
+  for_each     = local.workspaces
+  key          = "TFC_AZURE_RUN_CLIENT_ID"
+  value        = azurerm_user_assigned_identity.main[each.key].client_id
+  workspace_id = tfe_workspace.main[each.key].id
+  category     = "env"
+}
