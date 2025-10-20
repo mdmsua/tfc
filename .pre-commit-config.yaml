@@ -17,3 +17,4 @@ repos:
         args:
           - --hook-config=--mode=always-regenerate-lockfile
           - --args=-platform=linux_amd64
+          - --args=-platform=linux_arm64
