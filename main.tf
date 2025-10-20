@@ -2,7 +2,7 @@ locals {
   workspaces = { for f in fileset("${path.module}/workspaces", "*.yaml") : trimsuffix(f, ".yaml") => yamldecode(file("${path.module}/workspaces/${f}")) }
 
   resource_providers = {
-    "Microsoft.ContainerService" = ["EnableAPIServerVnetIntegrationPreview", "AzureOverlayDualStackPreview", "Microsoft.KubernetesConfiguration"]
+    "Microsoft.ContainerService" = ["EnableAPIServerVnetIntegrationPreview", "AzureOverlayDualStackPreview"]
     "Microsoft.Compute"          = ["EncryptionAtHost"]
   }
 }
