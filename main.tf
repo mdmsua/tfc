@@ -13,12 +13,8 @@ data "tfe_project" "main" {
 
 data "tfe_organization" "main" {}
 
-resource "tfe_oauth_client" "main" {
-  organization     = data.tfe_organization.main.name
-  api_url          = "https://api.github.com"
-  http_url         = "https://github.com"
-  oauth_token      = "ot-LtULrZJ8rQraLxoj"
-  service_provider = "github"
+data "tfe_oauth_client" "main" {
+  oauth_client_id = "oc-KCgcDFcTwXE5Q93R"
 }
 
 data "azurerm_client_config" "main" {}
@@ -37,7 +33,7 @@ resource "tfe_workspace" "main" {
   vcs_repo {
     identifier     = "mdmsua/tfc"
     branch         = "main"
-    oauth_token_id = tfe_oauth_client.main.oauth_token_id
+    oauth_token_id = data.tfe_oauth_client.main.oauth_token_id
   }
 }
 
