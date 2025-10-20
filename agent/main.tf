@@ -6,7 +6,11 @@ data "azurerm_subscription" "main" {
 }
 
 data "tfe_outputs" "registry" {
-  workspace = "acr"
+  workspace = "registry"
+}
+
+data "tfe_outputs" "root" {
+  workspace = "root"
 }
 
 data "azurerm_container_registry" "main" {
@@ -14,12 +18,8 @@ data "azurerm_container_registry" "main" {
   resource_group_name = provider::azurerm::parse_resource_id(data.tfe_outputs.registry.values.id).resource_group_name
 }
 
-resource "tfe_agent_pool" "main" {
-  name = "Azure"
-}
-
 resource "tfe_agent_token" "main" {
-  agent_pool_id = tfe_agent_pool.main.id
+  agent_pool_id = data.tfe_outputs.root.values.agent_pool_id
   description   = "Azure agent pool token"
 }
 

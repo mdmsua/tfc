@@ -21,9 +21,9 @@ resource "tfe_workspace" "main" {
   project_id                     = data.tfe_project.main.id
   allow_destroy_plan             = true
   auto_apply_run_trigger         = true
-  auto_destroy_activity_duration = "6h"
-  working_directory              = "root/workspaces/${each.key}"
-  terraform_version              = "~> 1.11.0"
+  auto_destroy_activity_duration = lookup(each.value, "ttl", "6h")
+  working_directory              = lookup(each.value, "directory", each.key)
+  terraform_version              = "~> 1.13.0"
   auto_apply                     = true
 
   vcs_repo {
@@ -36,12 +36,12 @@ resource "tfe_workspace" "main" {
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.4.2"
-  suffix  = ["tfc", "sdc"]
+  suffix  = ["tfc", "gwc"]
 }
 
 resource "azurerm_resource_group" "main" {
   name     = module.naming.resource_group.name
-  location = "swedencentral"
+  location = "germanywestcentral"
 }
 
 resource "azurerm_user_assigned_identity" "main" {
@@ -97,4 +97,21 @@ resource "azurerm_resource_provider_registration" "main" {
       registered = true
     }
   }
+}
+
+resource "tfe_agent_pool" "main" {
+  name = "Azure"
+}
+
+resource "tfe_agent_pool_allowed_workspaces" "main" {
+  agent_pool_id         = tfe_agent_pool.main.id
+  allowed_workspace_ids = [for k, v in local.workspaces : tfe_workspace.main[k].id if lookup(v, "agent", false)]
+}
+
+resource "tfe_workspace_settings" "main" {
+  for_each = { for k, v in local.workspaces : k => v if lookup(v, "agent", false) }
+
+  agent_pool_id  = tfe_agent_pool.main.id
+  workspace_id   = tfe_workspace.main[each.key].id
+  execution_mode = "agent"
 }
