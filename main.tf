@@ -82,14 +82,6 @@ resource "azurerm_role_assignment" "main" {
   role_definition_name = "Owner"
 }
 
-resource "tfe_variable" "main" {
-  for_each     = local.workspaces
-  key          = "TFC_AZURE_RUN_CLIENT_ID"
-  value        = azurerm_user_assigned_identity.main[each.key].client_id
-  workspace_id = tfe_workspace.main[each.key].id
-  category     = "env"
-}
-
 resource "azurerm_resource_provider_registration" "main" {
   for_each = local.resource_providers
   name     = each.key

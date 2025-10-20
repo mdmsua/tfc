@@ -1,9 +1,4 @@
 
-data "azurerm_client_config" "main" {}
-
-data "azurerm_subscription" "main" {
-  subscription_id = data.azurerm_client_config.main.subscription_id
-}
 
 data "tfe_outputs" "registry" {
   workspace = "registry"
@@ -40,21 +35,9 @@ resource "azurerm_user_assigned_identity" "main" {
   location            = azurerm_resource_group.main.location
 }
 
-resource "azurerm_role_assignment" "subscription_owner" {
-  role_definition_name = "Owner"
-  principal_id         = azurerm_user_assigned_identity.main.principal_id
-  scope                = data.azurerm_subscription.main.id
-}
-
-resource "azurerm_role_assignment" "cluster_admin" {
-  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  principal_id         = azurerm_user_assigned_identity.main.principal_id
-  scope                = data.azurerm_subscription.main.id
-}
-
 resource "azurerm_role_assignment" "repository_reader" {
   scope                = data.azurerm_container_registry.main.id
-  role_definition_name = "Container Registry Repository Writer"
+  role_definition_name = "Container Registry Repository Reader"
   principal_id         = azurerm_user_assigned_identity.main.principal_id
   principal_type       = "ServicePrincipal"
   condition_version    = "2.0"
@@ -81,7 +64,6 @@ resource "azurerm_container_group" "main" {
   os_type             = "Linux"
   ip_address_type     = "Public"
   restart_policy      = "Always"
-  zones               = ["1", "2", "3"]
 
   identity {
     type         = "UserAssigned"
