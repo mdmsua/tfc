@@ -33,3 +33,13 @@ resource "azurerm_container_registry_task" "main" {
     schedule = "0 0 * * *"
   }
 }
+
+resource "azapi_update_resource" "registry_role_assignment_mode" {
+  type        = "Microsoft.ContainerRegistry/registries@2025-04-01"
+  resource_id = azurerm_container_registry.main.id
+  body = {
+    properties = {
+      roleAssignmentMode = "AbacRepositoryPermissions"
+    }
+  }
+}

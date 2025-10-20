@@ -5,9 +5,13 @@ data "azurerm_subscription" "main" {
   subscription_id = data.azurerm_client_config.main.subscription_id
 }
 
+data "tfe_outputs" "registry" {
+  workspace = "registry"
+}
+
 data "azurerm_container_registry" "main" {
-  name                = split("-", data.azurerm_client_config.main.subscription_id)[0]
-  resource_group_name = split("-", data.azurerm_client_config.main.subscription_id)[0]
+  name                = provider::azurerm::parse_resource_id(data.tfe_outputs.registry.values.id).resource_name
+  resource_group_name = provider::azurerm::parse_resource_id(data.tfe_outputs.registry.values.id).resource_group_name
 }
 
 resource "tfe_agent_pool" "main" {
