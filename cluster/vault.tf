@@ -9,12 +9,6 @@ resource "azurerm_key_vault" "main" {
   enabled_for_disk_encryption   = true
   purge_protection_enabled      = true
   soft_delete_retention_days    = 7
-
-  network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-    ip_rules       = [data.tfe_outputs.agent.values.ip_address]
-  }
 }
 
 resource "azurerm_role_assignment" "key_vault_administrator" {

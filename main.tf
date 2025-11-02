@@ -127,3 +127,5 @@ resource "tfe_variable" "tfc_azure_run_client_id" {
   workspace_id = tfe_workspace.main[each.key].id
   category     = "env"
 }
+
+data "azuread_application_published_app_ids" "main" {}

@@ -4,10 +4,6 @@ module "naming" {
   suffix  = ["tfc", "sdc"]
 }
 
-data "tfe_outputs" "agent" {
-  workspace = "agent"
-}
-
 data "azurerm_client_config" "main" {}
 
 resource "azurerm_resource_group" "main" {
