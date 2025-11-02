@@ -211,7 +211,7 @@ resource "kubernetes_secret_v1" "repository" {
     }
   }
   data = {
-    url           = data.github_repository.main.ssh_clone_url
+    url           = "ssh://${data.github_repository.main.ssh_clone_url}"
     type          = "helm"
     project       = "default"
     sshPrivateKey = <<-EOT
@@ -234,24 +234,22 @@ resource "kubernetes_secret_v1" "cluster" {
   data = {
     name   = azurerm_kubernetes_cluster.main.name
     server = azurerm_kubernetes_cluster.main.kube_config[0].host
-    config = <<-EOT
-    {
-      "execProviderConfig": {
-        "command": "argocd-k8s-auth",
-        "env": {
-          "AAD_LOGIN_METHOD": "workloadidentity",
-          "AZURE_AUTHORITY_HOST": "https://login.microsoftonline.com/",
-          "AZURE_FEDERATED_TOKEN_FILE": "/var/run/secrets/azure/tokens/azure-identity-token"
-        },
-        "args": ["azure"],
-        "apiVersion": "client.authentication.k8s.io/v1beta1"
-      },
-      "tlsClientConfig": {
-        "insecure": false,
-        "caData"  : "${azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate}"
+    config = jsonencode({
+      execProviderConfig = {
+        command = "argocd-k8s-auth"
+        env = {
+          AAD_LOGIN_METHOD           = "workloadidentity"
+          AZURE_AUTHORITY_HOST       = "https://login.microsoftonline.com/"
+          AZURE_FEDERATED_TOKEN_FILE = "/var/run/secrets/azure/tokens/azure-identity-token"
+        }
+        args       = ["azure"]
+        apiVersion = "client.authentication.k8s.io/v1beta1"
       }
-    }
-    EOT
+      tlsClientConfig = {
+        insecure = false
+        caData   = azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
+      }
+    })
   }
 
   depends_on = [helm_release.argocd]
