@@ -215,7 +215,6 @@ resource "kubernetes_secret_v1" "repository" {
     type          = "helm"
     project       = "default"
     sshPrivateKey = <<-EOT
-      |
       ${tls_private_key.repository.private_key_openssh}
     EOT
   }
@@ -236,7 +235,6 @@ resource "kubernetes_secret_v1" "cluster" {
     name   = azurerm_kubernetes_cluster.main.name
     server = azurerm_kubernetes_cluster.main.kube_config[0].host
     config = <<-EOT
-    |
     {
       execProviderConfig = {
         command = "argocd-k8s-auth",
@@ -250,7 +248,7 @@ resource "kubernetes_secret_v1" "cluster" {
       },
       tlsClientConfig = {
         insecure = false,
-        caData   = azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
+        caData   = ${azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate}
       }
     }
     EOT
