@@ -238,8 +238,7 @@ resource "kubernetes_secret_v1" "cluster" {
   data_wo = {
     name   = azurerm_kubernetes_cluster.main.name
     server = "https://${azurerm_kubernetes_cluster.main.kube_config[0].host}"
-    config = <<-EOT
-    {
+    config = jsonencode({
       execProviderConfig = {
         command = "argocd-k8s-auth",
         env = {
@@ -254,10 +253,9 @@ resource "kubernetes_secret_v1" "cluster" {
       },
       tlsClientConfig = {
         insecure = false,
-        caData   = azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate
+        caData   = azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
       }
-    }
-    EOT
+    })
   }
 
   depends_on = [helm_release.argocd]
