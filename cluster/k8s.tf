@@ -211,10 +211,12 @@ resource "kubernetes_secret_v1" "repository" {
     }
   }
   data = {
-    url           = "ssh://${data.github_repository.main.ssh_clone_url}"
+    url           = data.github_repository.main.ssh_clone_url
     type          = "helm"
     project       = "default"
-    sshPrivateKey = tls_private_key.repository.private_key_openssh
+    sshPrivateKey = <<-EOT
+      ${tls_private_key.repository.private_key_openssh}
+    EOT
   }
 
   depends_on = [helm_release.argocd]
