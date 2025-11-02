@@ -237,8 +237,8 @@ resource "kubernetes_secret_v1" "cluster" {
         command = "argocd-k8s-auth",
         env = {
           AAD_LOGIN_METHOD           = "workloadidentity"
-          AZURE_CLIENT_ID            = azurerm_user_assigned_identity.argocd.client_id,
-          AZURE_TENANT_ID            = azurerm_user_assigned_identity.argocd.tenant_id,
+          AZURE_CLIENT_ID            = data.azurerm_client_config.main.client_id,
+          AZURE_TENANT_ID            = data.azurerm_client_config.main.tenant_id,
           AZURE_AUTHORITY_HOST       = "https://login.microsoftonline.com/",
           AZURE_FEDERATED_TOKEN_FILE = "/var/run/secrets/azure/tokens/azure-identity-token",
         },
