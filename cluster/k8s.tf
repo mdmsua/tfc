@@ -241,7 +241,7 @@ resource "kubernetes_secret_v1" "cluster" {
         "env": {
           "AAD_LOGIN_METHOD": "workloadidentity",
           "AZURE_AUTHORITY_HOST": "https://login.microsoftonline.com/",
-          "AZURE_FEDERATED_TOKEN_FILE": "/var/run/secrets/azure/tokens/azure-identity-token",
+          "AZURE_FEDERATED_TOKEN_FILE": "/var/run/secrets/azure/tokens/azure-identity-token"
         },
         "args": ["azure"],
         "apiVersion": "client.authentication.k8s.io/v1beta1"
