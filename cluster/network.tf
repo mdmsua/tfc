@@ -46,7 +46,7 @@ resource "azurerm_subnet" "nodes" {
 }
 
 resource "azurerm_network_security_group" "main" {
-  name                = module.naming.network_security_group
+  name                = module.naming.network_security_group.name
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 

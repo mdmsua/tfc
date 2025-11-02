@@ -98,7 +98,7 @@ resource "azurerm_federated_identity_credential" "argocd" {
 }
 
 resource "azurerm_user_assigned_identity" "external_secrets" {
-  name                = "${module.naming.user_assigned_identity}-external-secrets"
+  name                = "${module.naming.user_assigned_identity.name}-external-secrets"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 }
