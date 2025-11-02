@@ -17,9 +17,25 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.7.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.38.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.1.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.1.0"
+    }
     azapi = {
       source  = "azure/azapi"
       version = "~> 2.7.0"
+    }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.7.0"
     }
   }
   cloud {
@@ -58,3 +74,35 @@ provider "azuread" {
   client_id_file_path  = var.tfc_azure_dynamic_credentials.default.client_id_file_path
   oidc_token_file_path = var.tfc_azure_dynamic_credentials.default.oidc_token_file_path
 }
+
+provider "kubernetes" {
+  host                   = azurerm_kubernetes_cluster.main.kube_config[0].host
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate)
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "kubelogin"
+    args = [
+      "get-token",
+      "--server-id",
+      "6dae42f8-4368-4678-94ff-3960e28e3630"
+    ]
+  }
+}
+
+provider "helm" {
+  kubernetes = {
+    host                   = azurerm_kubernetes_cluster.main.kube_config[0].host
+    cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate)
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "kubelogin"
+      args = [
+        "get-token",
+        "--server-id",
+        "6dae42f8-4368-4678-94ff-3960e28e3630"
+      ]
+    }
+  }
+}
+
+provider "github" {}
