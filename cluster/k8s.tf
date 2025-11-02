@@ -212,7 +212,6 @@ resource "kubernetes_secret_v1" "repository" {
   }
   data = {
     url           = "ssh://git@github.com/${var.repository_name}"
-    type          = "helm"
     project       = "default"
     sshPrivateKey = <<-EOT
       ${trimspace(tls_private_key.repository.private_key_openssh)}
