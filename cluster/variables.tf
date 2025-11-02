@@ -29,3 +29,9 @@ variable "admins" {
   type        = list(string)
   default     = ["6b1aa092-b266-49f3-be05-341fff39cd59"]
 }
+
+variable "repository_name" {
+  description = "GitHub repository"
+  type        = string
+  default     = "mdmsua/tfc"
+}

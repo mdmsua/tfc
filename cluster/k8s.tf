@@ -187,7 +187,7 @@ resource "helm_release" "argocd" {
 }
 
 data "github_repository" "main" {
-  name = "tfc"
+  full_name = var.repository_name
 }
 
 resource "tls_private_key" "repository" {
@@ -211,7 +211,7 @@ resource "kubernetes_secret_v1" "repository" {
     }
   }
   data = {
-    url           = "ssh://${data.github_repository.main.ssh_clone_url}"
+    url           = "ssh://git@github.com/${var.repository_name}"
     type          = "helm"
     project       = "default"
     sshPrivateKey = <<-EOT
