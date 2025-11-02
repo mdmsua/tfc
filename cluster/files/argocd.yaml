@@ -68,5 +68,3 @@ configs:
       - openid
       - profile
       - email
-  secret:
-    argocdServerAdminPassword: {server_admin_password}

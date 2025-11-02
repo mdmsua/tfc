@@ -166,11 +166,6 @@ resource "azurerm_federated_identity_credential" "argocd_repo_server" {
   subject             = "system:serviceaccount:argocd:argocd-repo-server"
 }
 
-resource "random_password" "argocd" {
-  length  = 16
-  special = false
-}
-
 resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm/"
@@ -187,7 +182,6 @@ resource "helm_release" "argocd" {
       repo_server_client_id    = azurerm_user_assigned_identity.argocd_repo_server.client_id
       oidc_tenant_id           = data.azurerm_client_config.main.tenant_id
       oidc_client_id           = azuread_application.argocd.client_id
-      server_admin_password    = bcrypt(random_password.argocd.result, 1)
     })
   ]
 }
