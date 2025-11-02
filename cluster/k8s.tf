@@ -231,7 +231,7 @@ resource "kubernetes_secret_v1" "cluster" {
   }
   data = {
     name   = azurerm_kubernetes_cluster.main.name
-    server = "https://${azurerm_kubernetes_cluster.main.kube_config[0].host}"
+    server = azurerm_kubernetes_cluster.main.kube_config[0].host
     config = jsonencode({
       execProviderConfig = {
         command = "argocd-k8s-auth",
