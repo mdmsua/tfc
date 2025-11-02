@@ -74,7 +74,6 @@ resource "azurerm_public_ip" "ipv4" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   ip_version          = "IPv4"
-  zones               = ["1", "2", "3"]
 }
 
 resource "azurerm_public_ip" "ipv6" {
@@ -83,5 +82,4 @@ resource "azurerm_public_ip" "ipv6" {
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
   ip_version          = "IPv6"
-  zones               = ["1", "2", "3"]
 }

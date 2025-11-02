@@ -81,7 +81,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 
     load_balancer_profile {
       idle_timeout_in_minutes  = 4
-      outbound_ports_allocated = 8129
+      outbound_ports_allocated = 8192
       backend_pool_type        = "NodeIP"
 
       outbound_ip_address_ids = [
@@ -103,7 +103,6 @@ resource "azurerm_kubernetes_cluster" "main" {
     os_sku                      = "AzureLinux"
     vm_size                     = "Standard_B2ps_v2"
     vnet_subnet_id              = azurerm_subnet.nodes.id
-    zones                       = ["1", "2", "3"]
     orchestrator_version        = var.kubernetes_version
 
     upgrade_settings {
