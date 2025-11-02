@@ -210,7 +210,7 @@ resource "github_repository_deploy_key" "main" {
 resource "kubernetes_secret_v1" "repository" {
   metadata {
     name      = data.github_repository.main.name
-    namespace = "argocd"
+    namespace = helm_release.argocd.namespace
     labels = {
       "app.kubernetes.io/part-of"      = "argocd"
       "argocd.argoproj.io/secret-type" = "repo-creds"
@@ -229,7 +229,7 @@ resource "kubernetes_secret_v1" "repository" {
 resource "kubernetes_secret_v1" "cluster" {
   metadata {
     name      = azurerm_kubernetes_cluster.main.name
-    namespace = "argocd"
+    namespace = helm_release.argocd.namespace
     labels = {
       "app.kubernetes.io/part-of"      = "argocd"
       "argocd.argoproj.io/secret-type" = "cluster"

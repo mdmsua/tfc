@@ -13,6 +13,12 @@ data "azurerm_container_registry" "main" {
   resource_group_name = provider::azurerm::parse_resource_id(data.tfe_outputs.registry.values.id).resource_group_name
 }
 
+data "azurerm_client_config" "main" {}
+
+data "azurerm_subscription" "main" {
+  subscription_id = data.azurerm_client_config.main.subscription_id
+}
+
 resource "tfe_agent_token" "main" {
   agent_pool_id = data.tfe_outputs.root.values.agent_pool_id
   description   = "Azure agent pool token"
@@ -54,6 +60,13 @@ resource "azurerm_role_assignment" "repository_reader" {
  )
 )
   EOF
+}
+
+resource "azurerm_role_assignment" "aks_rbac_cluster_admin" {
+  scope                = data.azurerm_subscription.main.id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  principal_id         = azurerm_user_assigned_identity.main.principal_id
+  principal_type       = "ServicePrincipal"
 }
 
 resource "azurerm_container_group" "main" {
