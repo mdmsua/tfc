@@ -77,7 +77,7 @@ resource "azurerm_user_assigned_identity" "external_secrets" {
 
 resource "azurerm_federated_identity_credential" "external_secrets" {
   name                = azurerm_kubernetes_cluster.main.name
-  resource_group_name = azurerm_kubernetes_cluster.main.node_resource_group
+  resource_group_name = azurerm_kubernetes_cluster.main.resource_group_name
   parent_id           = azurerm_user_assigned_identity.external_secrets.id
 
   audience = ["api://AzureADTokenExchange"]

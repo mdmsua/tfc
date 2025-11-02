@@ -81,6 +81,11 @@ provider "kubernetes" {
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "kubelogin"
+    env = {
+      AZURE_CLIENT_ID      = data.azurerm_client_config.main.client_id
+      AZURE_TENANT_ID      = data.azurerm_client_config.main.tenant_id
+      AZURE_AUTHORITY_HOST = "https://login.microsoftonline.com/"
+    }
     args = [
       "get-token",
       "--server-id",
@@ -96,6 +101,11 @@ provider "helm" {
     exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "kubelogin"
+      env = {
+        AZURE_CLIENT_ID      = data.azurerm_client_config.main.client_id
+        AZURE_TENANT_ID      = data.azurerm_client_config.main.tenant_id
+        AZURE_AUTHORITY_HOST = "https://login.microsoftonline.com/"
+      }
       args = [
         "get-token",
         "--server-id",
