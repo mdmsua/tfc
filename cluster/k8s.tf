@@ -234,7 +234,7 @@ resource "kubernetes_secret_v1" "cluster" {
   data = {
     name   = azurerm_kubernetes_cluster.main.name
     server = azurerm_kubernetes_cluster.main.kube_config[0].host
-    config = <<-EOT
+    config = <<EOT
     {
       execProviderConfig = {
         command = "argocd-k8s-auth",
