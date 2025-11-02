@@ -3,7 +3,7 @@ data "azuread_application_published_app_ids" "main" {}
 resource "azuread_service_principal" "main" {
   for_each = var.roles
 
-  client_id    = data.azuread_application_published_app_ids.main[each.key]
+  client_id    = data.azuread_application_published_app_ids.main.result[each.key]
   use_existing = true
 }
 
