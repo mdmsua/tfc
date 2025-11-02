@@ -1,1 +1,4 @@
 agent: true
+roles:
+  MicrosoftGraph:
+    - Application.ReadWrite.OwnedBy

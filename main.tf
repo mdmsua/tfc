@@ -128,4 +128,11 @@ resource "tfe_variable" "tfc_azure_run_client_id" {
   category     = "env"
 }
 
-data "azuread_application_published_app_ids" "main" {}
+module "assignment" {
+  source = "./modules/assignment"
+
+  for_each = { for k, v in local.workspaces : k => v if contains(keys(v), "roles") }
+
+  principal_id = azurerm_user_assigned_identity.main[each.key].principal_id
+  roles        = each.value.roles
+}
