@@ -215,6 +215,7 @@ resource "kubernetes_secret_v1" "repository" {
     type          = "helm"
     project       = "default"
     sshPrivateKey = <<-EOT
+      |
       ${tls_private_key.repository.private_key_openssh}
     EOT
   }
@@ -234,13 +235,13 @@ resource "kubernetes_secret_v1" "cluster" {
   data = {
     name   = azurerm_kubernetes_cluster.main.name
     server = azurerm_kubernetes_cluster.main.kube_config[0].host
-    config = jsonencode({
+    config = <<-EOT
+    |
+    {
       execProviderConfig = {
         command = "argocd-k8s-auth",
         env = {
           AAD_LOGIN_METHOD           = "workloadidentity"
-          AZURE_CLIENT_ID            = data.azurerm_client_config.main.client_id,
-          AZURE_TENANT_ID            = data.azurerm_client_config.main.tenant_id,
           AZURE_AUTHORITY_HOST       = "https://login.microsoftonline.com/",
           AZURE_FEDERATED_TOKEN_FILE = "/var/run/secrets/azure/tokens/azure-identity-token",
         },
@@ -251,7 +252,8 @@ resource "kubernetes_secret_v1" "cluster" {
         insecure = false,
         caData   = azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
       }
-    })
+    }
+    EOT
   }
 
   depends_on = [helm_release.argocd]
