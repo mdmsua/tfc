@@ -207,7 +207,7 @@ resource "kubernetes_secret_v1" "repository" {
     namespace = helm_release.argocd.namespace
     labels = {
       "app.kubernetes.io/part-of"      = "argocd"
-      "argocd.argoproj.io/secret-type" = "repo-creds"
+      "argocd.argoproj.io/secret-type" = "repository"
     }
   }
   data = {
