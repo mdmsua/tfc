@@ -239,7 +239,7 @@ resource "kubernetes_secret_v1" "cluster" {
       "execProviderConfig": {
         "command": "argocd-k8s-auth",
         "env": {
-          "AAD_LOGIN_METHOD": "workloadidentity"
+          "AAD_LOGIN_METHOD": "workloadidentity",
           "AZURE_AUTHORITY_HOST": "https://login.microsoftonline.com/",
           "AZURE_FEDERATED_TOKEN_FILE": "/var/run/secrets/azure/tokens/azure-identity-token",
         },
