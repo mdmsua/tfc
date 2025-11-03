@@ -38,7 +38,7 @@ resource "azurerm_role_assignment" "cluster_managed_identity_operator_kubelet" {
 resource "azurerm_role_assignment" "cluster_network_contributor" {
   principal_id         = azurerm_user_assigned_identity.cluster.principal_id
   role_definition_name = "Network Contributor"
-  scope                = azurerm_virtual_network.main.id
+  scope                = azurerm_resource_group.main.id
 }
 
 resource "azurerm_role_assignment" "cluster_disk_encryption_set_reader" {
