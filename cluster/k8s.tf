@@ -264,9 +264,12 @@ resource "helm_release" "apps" {
 
   values = [<<-EOT
     resources:
-      - ${indent(4, file("${path.module}/files/apps.yaml"))}
+      - ${indent(4, templatefile("${path.module}/files/apps.yaml", {
+    external_secrets_client_id = azurerm_user_assigned_identity.external_secrets.client_id
+    key_vault_url              = azurerm_key_vault.main.vault_uri
+}))}
   EOT
-  ]
+]
 
-  depends_on = [helm_release.argocd]
+depends_on = [helm_release.argocd]
 }

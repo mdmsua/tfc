@@ -5,3 +5,6 @@ spec:
 
 nginx:
   version: "4.14.0"
+
+externalSecrets:
+  version: "0.20.4"
