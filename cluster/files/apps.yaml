@@ -19,7 +19,10 @@ spec:
       - PruneLast=true
   source:
     repoURL: ssh://git@github.com/mdmsua/tfc.git
-    targetRevision: main
+    targetRevision: HEAD
     path: apps
+    helm:
+      valueFiles:
+        - values.yaml
     directory:
       recurse: true
