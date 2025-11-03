@@ -254,19 +254,19 @@ resource "kubernetes_secret_v1" "cluster" {
   depends_on = [helm_release.argocd]
 }
 
-# resource "helm_release" "apps" {
-#   name             = "apps"
-#   repository       = "https://bedag.github.io/helm-charts/"
-#   chart            = "raw"
-#   version          = "2.0.0"
-#   namespace        = helm_release.argocd.namespace
-#   create_namespace = false
+resource "helm_release" "apps" {
+  name             = "apps"
+  repository       = "https://bedag.github.io/helm-charts/"
+  chart            = "raw"
+  version          = "2.0.0"
+  namespace        = helm_release.argocd.namespace
+  create_namespace = false
 
-#   values = [<<-EOT
-#     resources:
-#       - ${indent(4, file("${path.module}/files/appproject.yaml"))}
-#   EOT
-#   ]
+  values = [<<-EOT
+    resources:
+      - ${indent(4, file("${path.module}/files/apps.yaml"))}
+  EOT
+  ]
 
-#   depends_on = [helm_release.argocd]
-# }
+  depends_on = [helm_release.argocd]
+}

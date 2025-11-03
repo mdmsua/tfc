@@ -1,0 +1,7 @@
+spec:
+  source:
+  destination:
+    server: https://kubernetes.default.svc
+
+nginx:
+  version: "4.14.0"
