@@ -16,3 +16,6 @@ externalDns:
 cloudflare:
   secretName: cloudflare
   apiTokenKey: api-token
+
+certManager:
+  version: "v1.19.1"
