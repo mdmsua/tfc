@@ -28,5 +28,7 @@ spec:
         externalSecrets:
           clientId: ${external_secrets_client_id}
           vaultUrl: ${key_vault_url}
+        cloudflare:
+          remoteKey: ${cloudflare_remote_key}
     directory:
       recurse: true

@@ -33,3 +33,13 @@ resource "azurerm_key_vault_key" "cluster" {
     azurerm_role_assignment.key_vault_administrator,
   ]
 }
+
+resource "azurerm_key_vault_secret" "cloudflare_api_token" {
+  name         = "cloudflare-api-token"
+  key_vault_id = azurerm_key_vault.main.id
+  value        = var.cloudflare_api_token
+
+  depends_on = [
+    azurerm_role_assignment.key_vault_administrator
+  ]
+}

@@ -267,6 +267,7 @@ resource "helm_release" "apps" {
       - ${indent(4, templatefile("${path.module}/files/apps.yaml", {
     external_secrets_client_id = azurerm_user_assigned_identity.external_secrets.client_id
     key_vault_url              = azurerm_key_vault.main.vault_uri
+    cloudflare_remote_key      = azurerm_key_vault_secret.cloudflare_api_token.name
 }))}
   EOT
 ]
