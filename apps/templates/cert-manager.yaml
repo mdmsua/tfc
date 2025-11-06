@@ -15,7 +15,7 @@ spec:
           enabled: true
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: external-dns
+    namespace: cert-manager
   syncPolicy:
     automated:
       prune: true
