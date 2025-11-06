@@ -45,6 +45,8 @@ kind: ExternalSecret
 metadata:
   name: {{ .Values.cloudflare.secretName }}
   namespace: external-dns
+  labels:
+    app.kubernetes.io/instance: external-dns
 spec:
   secretStoreRef:
     name: {{ .Values.externalSecrets.secretStoreName }}
