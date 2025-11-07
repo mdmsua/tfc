@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    chart: haproxy-ingress
+    chart: haproxy-kubernetes-ingress
     repoURL: https://haproxytech.github.io/helm-charts
     targetRevision: {{ .Values.haproxy.version }}
     helm:
@@ -21,7 +21,7 @@ spec:
             - IPv6
   destination:
     server: {{ .Values.spec.destination.server }}
-    namespace: haproxy-ingress
+    namespace: haproxy-controller
   syncPolicy:
     automated:
       prune: true
