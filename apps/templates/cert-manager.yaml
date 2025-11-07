@@ -14,7 +14,7 @@ spec:
         crds:
           enabled: true
   destination:
-    server: {{ .Values.spec.destination.server }}
+    server: in-cluster
     namespace: cert-manager
   syncPolicy:
     automated:

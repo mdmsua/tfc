@@ -27,7 +27,7 @@ spec:
                 name: {{ .Values.cloudflare.secretName }}
                 key: {{ .Values.cloudflare.apiTokenKey }}
   destination:
-    server: {{ .Values.spec.destination.server }}
+    server: in-cluster
     namespace: external-dns
   syncPolicy:
     automated:
