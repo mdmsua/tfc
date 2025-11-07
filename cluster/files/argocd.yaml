@@ -12,23 +12,23 @@ notifications:
 redis-ha:
   enabled: true
 
-controller:
-  podLabels:
-    azure.workload.identity/use: "true"
-  serviceAccount:
-    annotations:
-      azure.workload.identity/client-id: "${controller_client_id}"
+# controller:
+#   podLabels:
+#     azure.workload.identity/use: "true"
+#   serviceAccount:
+#     annotations:
+#       azure.workload.identity/client-id: "${controller_client_id}"
 
 repoServer:
   autoscaling:
     enabled: true
     minReplicas: 1
     maxReplicas: 3
-  podLabels:
-    azure.workload.identity/use: "true"
-  serviceAccount:
-    annotations:
-      azure.workload.identity/client-id: "${repo_server_client_id}"
+  # podLabels:
+  #   azure.workload.identity/use: "true"
+  # serviceAccount:
+  #   annotations:
+  #     azure.workload.identity/client-id: "${repo_server_client_id}"
 
 server:
   autoscaling:
@@ -39,7 +39,7 @@ server:
     azure.workload.identity/use: "true"
   serviceAccount:
     annotations:
-      azure.workload.identity/client-id: "${server_client_id}"
+      azure.workload.identity/client-id: "${oidc_client_id}"
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -51,6 +51,8 @@ server:
 
 configs:
   cm:
+    admin.enabled: false
+    users.anonymous.enabled: false
     oidc.config: |
       name: Azure
       issuer: https://login.microsoftonline.com/${oidc_tenant_id}/v2.0
@@ -60,7 +62,6 @@ configs:
       requestedIDTokenClaims:
         groups:
           essential: true
-          value: "SecurityGroup"
       requestedScopes:
         - openid
         - profile

@@ -69,6 +69,14 @@ resource "azuread_application" "argocd" {
   }
 }
 
+resource "azuread_application_federated_identity_credential" "argocd" {
+  application_id = azuread_application.argocd.id
+  issuer         = azurerm_kubernetes_cluster.main.oidc_issuer_url
+  audiences      = ["api://AzureADTokenExchange"]
+  subject        = "system:serviceaccount:argocd:argocd-server"
+  display_name   = azurerm_kubernetes_cluster.main.name
+}
+
 resource "azurerm_user_assigned_identity" "external_secrets" {
   name                = "${module.naming.user_assigned_identity.name}-external-secrets"
   resource_group_name = azurerm_resource_group.main.name
