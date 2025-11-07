@@ -9,17 +9,17 @@ metadata:
 data:
   url: https://{{ .Values.domain }}/
   admin.enabled: false
-    users.anonymous.enabled: false
-    oidc.config: |
-      name: Azure
-      issuer: https://login.microsoftonline.com/{{ .Values.oidc.tenantId }}/v2.0
-      clientID: {{ .Values.oidc.clientId }}
-      azure:
-        useWorkloadIdentity: true
-      requestedIDTokenClaims:
-        groups:
-          essential: true
-      requestedScopes:
-        - openid
-        - profile
-        - email
+  users.anonymous.enabled: false
+  oidc.config: |
+    name: Azure
+    issuer: https://login.microsoftonline.com/{{ .Values.oidc.tenantId }}/v2.0
+    clientID: {{ .Values.oidc.clientId }}
+    azure:
+      useWorkloadIdentity: true
+    requestedIDTokenClaims:
+      groups:
+        essential: true
+    requestedScopes:
+      - openid
+      - profile
+      - email
