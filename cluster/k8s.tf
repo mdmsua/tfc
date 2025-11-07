@@ -77,6 +77,13 @@ resource "azuread_application_federated_identity_credential" "argocd" {
   display_name   = azurerm_kubernetes_cluster.main.name
 }
 
+resource "azuread_group" "argocd_admins" {
+  display_name     = "ArgoCD Admins"
+  owners           = [data.azuread_client_config.main.object_id]
+  members          = var.admins
+  security_enabled = true
+}
+
 resource "azurerm_user_assigned_identity" "external_secrets" {
   name                = "${module.naming.user_assigned_identity.name}-external-secrets"
   resource_group_name = azurerm_resource_group.main.name
@@ -99,66 +106,6 @@ resource "azurerm_role_assignment" "external_secrets" {
   principal_id         = azurerm_user_assigned_identity.external_secrets.principal_id
 }
 
-resource "azurerm_user_assigned_identity" "argocd" {
-  name                = "${module.naming.user_assigned_identity.name}-argocd"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-}
-
-resource "azurerm_federated_identity_credential" "argocd" {
-  name                = azurerm_kubernetes_cluster.main.name
-  resource_group_name = azurerm_kubernetes_cluster.main.resource_group_name
-  issuer              = azurerm_kubernetes_cluster.main.oidc_issuer_url
-  audience            = ["api://AzureADTokenExchange"]
-  parent_id           = azurerm_user_assigned_identity.argocd.id
-  subject             = "system:serviceaccount:argocd:argocd"
-}
-
-resource "azurerm_user_assigned_identity" "argocd_server" {
-  name                = "${module.naming.user_assigned_identity.name}-argocd-server"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-}
-
-resource "azurerm_federated_identity_credential" "argocd_server" {
-  name                = azurerm_kubernetes_cluster.main.name
-  resource_group_name = azurerm_kubernetes_cluster.main.resource_group_name
-  issuer              = azurerm_kubernetes_cluster.main.oidc_issuer_url
-  audience            = ["api://AzureADTokenExchange"]
-  parent_id           = azurerm_user_assigned_identity.argocd_server.id
-  subject             = "system:serviceaccount:argocd:argocd-server"
-}
-
-resource "azurerm_user_assigned_identity" "argocd_application_controller" {
-  name                = "${module.naming.user_assigned_identity.name}-argocd-application-controller"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-}
-
-resource "azurerm_federated_identity_credential" "argocd_application_controller" {
-  name                = azurerm_kubernetes_cluster.main.name
-  resource_group_name = azurerm_kubernetes_cluster.main.resource_group_name
-  issuer              = azurerm_kubernetes_cluster.main.oidc_issuer_url
-  audience            = ["api://AzureADTokenExchange"]
-  parent_id           = azurerm_user_assigned_identity.argocd_application_controller.id
-  subject             = "system:serviceaccount:argocd:argocd-application-controller"
-}
-
-resource "azurerm_user_assigned_identity" "argocd_repo_server" {
-  name                = "${module.naming.user_assigned_identity.name}-argocd-repo-server"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-}
-
-resource "azurerm_federated_identity_credential" "argocd_repo_server" {
-  name                = azurerm_kubernetes_cluster.main.name
-  resource_group_name = azurerm_kubernetes_cluster.main.resource_group_name
-  issuer              = azurerm_kubernetes_cluster.main.oidc_issuer_url
-  audience            = ["api://AzureADTokenExchange"]
-  parent_id           = azurerm_user_assigned_identity.argocd_repo_server.id
-  subject             = "system:serviceaccount:argocd:argocd-repo-server"
-}
-
 resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm/"
@@ -169,11 +116,9 @@ resource "helm_release" "argocd" {
 
   values = [
     templatefile("${path.module}/files/argocd.yaml", {
-      server_client_id      = azurerm_user_assigned_identity.argocd_server.client_id
-      controller_client_id  = azurerm_user_assigned_identity.argocd_application_controller.client_id
-      repo_server_client_id = azurerm_user_assigned_identity.argocd_repo_server.client_id
-      oidc_tenant_id        = data.azurerm_client_config.main.tenant_id
-      oidc_client_id        = azuread_application.argocd.client_id
+      oidc_tenant_id = data.azurerm_client_config.main.tenant_id
+      oidc_client_id = azuread_application.argocd.client_id
+      oidc_group_id  = azuread_group.argocd_admins.object_id
     })
   ]
 }
