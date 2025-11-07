@@ -8,8 +8,8 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   url: https://{{ .Values.domain }}/
-  admin.enabled: false
-  users.anonymous.enabled: false
+  admin.enabled: "false"
+  users.anonymous.enabled: "false"
   oidc.config: |
     name: Azure
     issuer: https://login.microsoftonline.com/{{ .Values.oidc.tenantId }}/v2.0
