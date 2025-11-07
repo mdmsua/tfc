@@ -1,3 +1,5 @@
+url: https://argocd.dmmo.io/
+
 global:
   domain: argocd.dmmo.io
 
@@ -44,6 +46,7 @@ server:
     annotations:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+      cert-manager.io/cluster-issuer: letsencrypt
     tls: true
 
 configs:
