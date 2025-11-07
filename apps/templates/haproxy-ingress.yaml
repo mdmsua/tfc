@@ -22,7 +22,7 @@ spec:
               - IPv6
           kubernetesGateway:
             enabled: true
-            gatewayControllerName: haproxy
+            gatewayControllerName: haproxy.org/gateway-controller
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: haproxy-controller
@@ -43,4 +43,4 @@ metadata:
   namespace: default
   name: haproxy
 spec:
-  controllerName: haproxy
+  controllerName: haproxy.org/gateway-controller
