@@ -22,3 +22,6 @@ certManager:
 
 haproxy:
   version: "1.46.0"
+
+gatewayApi:
+  version: "v1.4.0"
