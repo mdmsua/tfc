@@ -58,8 +58,8 @@ configs:
       useWorkloadIdentity: true
     requestedIDTokenClaims:
       groups:
-          essential: true
-          value: "SecurityGroup"
+        essential: true
+        value: "SecurityGroup"
     requestedScopes:
       - openid
       - profile
