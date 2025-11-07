@@ -46,13 +46,6 @@ server:
       nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     tls: true
 
-applicationSet:
-  podLabels:
-    azure.workload.identity/use: "true"
-  serviceAccount:
-    annotations:
-      azure.workload.identity/client-id: "${applicationset_client_id}"
-
 configs:
   oidc.config: |
     name: Azure

@@ -136,21 +136,6 @@ resource "azurerm_federated_identity_credential" "argocd_application_controller"
   subject             = "system:serviceaccount:argocd:argocd-application-controller"
 }
 
-resource "azurerm_user_assigned_identity" "argocd_applicationset_controller" {
-  name                = "${module.naming.user_assigned_identity.name}-argocd-applicationset-controller"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-}
-
-resource "azurerm_federated_identity_credential" "argocd_applicationset_controller" {
-  name                = azurerm_kubernetes_cluster.main.name
-  resource_group_name = azurerm_kubernetes_cluster.main.resource_group_name
-  issuer              = azurerm_kubernetes_cluster.main.oidc_issuer_url
-  audience            = ["api://AzureADTokenExchange"]
-  parent_id           = azurerm_user_assigned_identity.argocd_applicationset_controller.id
-  subject             = "system:serviceaccount:argocd:argocd-applicationset-controller"
-}
-
 resource "azurerm_user_assigned_identity" "argocd_repo_server" {
   name                = "${module.naming.user_assigned_identity.name}-argocd-repo-server"
   resource_group_name = azurerm_resource_group.main.name
@@ -176,12 +161,11 @@ resource "helm_release" "argocd" {
 
   values = [
     templatefile("${path.module}/files/argocd.yaml", {
-      server_client_id         = azurerm_user_assigned_identity.argocd_server.client_id
-      controller_client_id     = azurerm_user_assigned_identity.argocd_application_controller.client_id
-      applicationset_client_id = azurerm_user_assigned_identity.argocd_applicationset_controller.client_id
-      repo_server_client_id    = azurerm_user_assigned_identity.argocd_repo_server.client_id
-      oidc_tenant_id           = data.azurerm_client_config.main.tenant_id
-      oidc_client_id           = azuread_application.argocd.client_id
+      server_client_id      = azurerm_user_assigned_identity.argocd_server.client_id
+      controller_client_id  = azurerm_user_assigned_identity.argocd_application_controller.client_id
+      repo_server_client_id = azurerm_user_assigned_identity.argocd_repo_server.client_id
+      oidc_tenant_id        = data.azurerm_client_config.main.tenant_id
+      oidc_client_id        = azuread_application.argocd.client_id
     })
   ]
 }
@@ -216,39 +200,6 @@ resource "kubernetes_secret_v1" "repository" {
     sshPrivateKey = <<-EOT
       ${trimspace(tls_private_key.repository.private_key_openssh)}
     EOT
-  }
-
-  depends_on = [helm_release.argocd]
-}
-
-resource "kubernetes_secret_v1" "cluster" {
-  metadata {
-    name      = azurerm_kubernetes_cluster.main.name
-    namespace = helm_release.argocd.namespace
-    labels = {
-      "app.kubernetes.io/part-of"      = "argocd"
-      "argocd.argoproj.io/secret-type" = "cluster"
-    }
-  }
-  data = {
-    name   = azurerm_kubernetes_cluster.main.name
-    server = azurerm_kubernetes_cluster.main.kube_config[0].host
-    config = jsonencode({
-      execProviderConfig = {
-        command = "argocd-k8s-auth"
-        env = {
-          AAD_LOGIN_METHOD           = "workloadidentity"
-          AZURE_AUTHORITY_HOST       = "https://login.microsoftonline.com/"
-          AZURE_FEDERATED_TOKEN_FILE = "/var/run/secrets/azure/tokens/azure-identity-token"
-        }
-        args       = ["azure"]
-        apiVersion = "client.authentication.k8s.io/v1beta1"
-      }
-      tlsClientConfig = {
-        insecure = false
-        caData   = azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate
-      }
-    })
   }
 
   depends_on = [helm_release.argocd]
