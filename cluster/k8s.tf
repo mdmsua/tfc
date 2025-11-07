@@ -205,23 +205,12 @@ resource "kubernetes_secret_v1" "repository" {
   depends_on = [helm_release.argocd]
 }
 
-resource "helm_release" "apps" {
-  name             = "apps"
-  repository       = "https://bedag.github.io/helm-charts/"
-  chart            = "raw"
-  version          = "2.0.0"
-  namespace        = helm_release.argocd.namespace
-  create_namespace = false
-
-  values = [<<-EOT
-    resources:
-      - ${indent(4, templatefile("${path.module}/files/apps.yaml", {
+resource "kubectl_manifest" "apps" {
+  yaml_body = templatefile("${path.module}/files/apps.yaml", {
     external_secrets_client_id = azurerm_user_assigned_identity.external_secrets.client_id
     key_vault_url              = azurerm_key_vault.main.vault_uri
     cloudflare_remote_key      = azurerm_key_vault_secret.cloudflare_api_token.name
-}))}
-  EOT
-]
+  })
 
-depends_on = [helm_release.argocd]
+  depends_on = [helm_release.argocd]
 }

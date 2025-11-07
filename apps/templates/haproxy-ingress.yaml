@@ -10,15 +10,16 @@ spec:
     repoURL: https://haproxytech.github.io/helm-charts
     targetRevision: {{ .Values.haproxy.version }}
     helm:
-      controller:
-        service:
-          annotations:
-            service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-          type: LoadBalancer
-          ipFamilyPolicy: PreferDualStack
-          ipFamilies:
-            - IPv4
-            - IPv6
+      valuesObject:
+        controller:
+          service:
+            annotations:
+              service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
+            type: LoadBalancer
+            ipFamilyPolicy: PreferDualStack
+            ipFamilies:
+              - IPv4
+              - IPv6
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: haproxy-controller

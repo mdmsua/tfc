@@ -37,6 +37,10 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.7.0"
     }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "~> 1.19.0"
+    }
   }
   cloud {
     organization = "dmmo"
@@ -106,6 +110,23 @@ provider "helm" {
         "msi"
       ]
     }
+  }
+}
+
+provider "kubectl" {
+  host                   = azurerm_kubernetes_cluster.main.kube_config[0].host
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.main.kube_config[0].cluster_ca_certificate)
+  load_config_file       = false
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "kubelogin"
+    args = [
+      "get-token",
+      "--server-id",
+      "6dae42f8-4368-4678-94ff-3960e28e3630",
+      "-l",
+      "msi"
+    ]
   }
 }
 

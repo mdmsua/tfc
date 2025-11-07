@@ -50,7 +50,7 @@ configs:
   oidc.config: |
     name: Azure
     issuer: https://login.microsoftonline.com/{oidc_tenant_id}/v2.0
-    clientID: {oidc_client_id}
+    clientID: ${oidc_client_id}
     azure:
       useWorkloadIdentity: true
     requestedIDTokenClaims:
