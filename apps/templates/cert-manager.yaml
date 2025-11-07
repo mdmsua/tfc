@@ -5,14 +5,17 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    chart: cert-manager
-    repoURL: oci://quay.io/jetstack/charts/cert-manager
-    targetRevision: {{ .Values.certManager.version }}
-    helm:
-      valuesObject:
-        crds:
-          enabled: true
+  sources:
+    - repoURL: oci://quay.io/jetstack/charts/cert-manager
+      chart: cert-manager
+      targetRevision: {{ .Values.certManager.version }}
+      helm:
+        valuesObject:
+          crds:
+            enabled: true
+    - repoURL: ssh://git@github.com/mdmsua/tfc.git
+      path: apps/templates/cert-manager
+      targetRevision: HEAD
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: cert-manager
@@ -26,40 +29,3 @@ spec:
       - ApplyOutOfSyncOnly=true
       - ServerSideApply=true
       - PruneLast=true
----
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: {{ .Values.cloudflare.secretName }}
-  namespace: cert-manager
-  labels:
-    app.kubernetes.io/instance: cert-manager
-spec:
-  secretStoreRef:
-    name: {{ .Values.externalSecrets.secretStoreName }}
-    kind: ClusterSecretStore
-  data:
-    - secretKey: {{ .Values.cloudflare.apiTokenKey }}
-      remoteRef:
-        key: {{ .Values.cloudflare.remoteKey }}
-  refreshPolicy: Periodic
-  refreshInterval: 5m
----
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt
-  labels:
-    app.kubernetes.io/instance: cert-manager
-spec:
-  acme:
-    email: acme@dmmo.io
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    privateKeySecretRef:
-      name: letsencrypt
-    solvers:
-    - dns01:
-        cloudflare:
-          apiTokenSecretRef:
-            name: {{ .Values.cloudflare.apiTokenKey }}
-            key: {{ .Values.cloudflare.apiTokenKey }}
