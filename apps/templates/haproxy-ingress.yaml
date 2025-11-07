@@ -20,6 +20,9 @@ spec:
             ipFamilies:
               - IPv4
               - IPv6
+          kubernetesGateway:
+            enabled: true
+            gatewayControllerName: haproxy
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: haproxy-controller
