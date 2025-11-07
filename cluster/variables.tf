@@ -41,3 +41,9 @@ variable "cloudflare_api_token" {
   type        = string
   sensitive   = true
 }
+
+variable "domain" {
+  description = "Domain name"
+  type        = string
+  default     = "dmmo.io"
+}

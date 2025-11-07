@@ -25,8 +25,13 @@ spec:
       valueFiles:
         - values.yaml
       valuesObject:
+        domain: ${domain}
         externalSecrets:
           clientId: ${external_secrets_client_id}
           vaultUrl: ${key_vault_url}
         cloudflare:
           remoteKey: ${cloudflare_remote_key}
+        oidc:
+          tenantId: ${oidc_tenant_id}
+          clientId: ${oidc_client_id}
+          groupId: ${oidc_group_id}
