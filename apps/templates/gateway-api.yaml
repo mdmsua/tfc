@@ -8,7 +8,7 @@ spec:
   source:
     path: config/crd
     repoURL: https://github.com/kubernetes-sigs/gateway-api.git
-    targetRevision: HEAD
+    targetRevision: {{ .Values.gatewayApi.version }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: default
