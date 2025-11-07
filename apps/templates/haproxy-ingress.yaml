@@ -20,7 +20,7 @@ spec:
             - IPv4
             - IPv6
   destination:
-    server: in-cluster
+    server: {{ .Values.spec.destination.server }}
     namespace: haproxy-ingress
   syncPolicy:
     automated:

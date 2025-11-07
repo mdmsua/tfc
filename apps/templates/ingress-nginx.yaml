@@ -23,7 +23,7 @@ spec:
               service.beta.kubernetes.io/port_80_no_probe_rule: true
               service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
   destination:
-    server: in-cluster
+    server: {{ .Values.spec.destination.server }}
     namespace: ingress-nginx
   syncPolicy:
     automated:
