@@ -16,6 +16,9 @@ spec:
     - repoURL: ssh://git@github.com/mdmsua/tfc.git
       path: apps/templates/cert-manager
       targetRevision: HEAD
+      helm:
+        valuesObject:
+          cloudflare: {{ .Values.cloudflare.secretName }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: cert-manager
