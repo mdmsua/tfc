@@ -6,11 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    path: config/crd/standard
+    path: config/crd
     repoURL: https://github.com/kubernetes-sigs/gateway-api.git
-    targetRevision: {{ .Values.gatewayApi.version }}
-    directory:
-      recurse: true
+    targetRevision: HEAD
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: default
