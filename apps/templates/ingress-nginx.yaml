@@ -12,7 +12,8 @@ spec:
     helm:
       valuesObject:
         controller:
-          extraArgs: {}
+          extraArgs:
+            enable-ssl-passthrough: true
           service:
             ipFamilyPolicy: PreferDualStack
             ipFamilies:
