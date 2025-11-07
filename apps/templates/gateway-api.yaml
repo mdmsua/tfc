@@ -22,3 +22,11 @@ spec:
       - ApplyOutOfSyncOnly=true
       - ServerSideApply=true
       - PruneLast=true
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  namespace: default
+  name: haproxy
+spec:
+  controllerName: haproxy
