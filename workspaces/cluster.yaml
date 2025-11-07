@@ -2,3 +2,4 @@ agent: true
 roles:
   MicrosoftGraph:
     - Application.ReadWrite.OwnedBy
+    - Group.ReadWrite.All
