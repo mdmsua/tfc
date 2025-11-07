@@ -18,7 +18,8 @@ spec:
       targetRevision: HEAD
       helm:
         valuesObject:
-          cloudflare: {{ .Values.cloudflare.secretName }}
+          cloudflare: {{ .Values.cloudflare }}
+          externalSecrets: {{ .Values.externalSecrets }}
   destination:
     server: {{ .Values.spec.destination.server }}
     namespace: cert-manager
