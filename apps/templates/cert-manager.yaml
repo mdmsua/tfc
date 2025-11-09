@@ -13,7 +13,7 @@ spec:
         valuesObject:
           crds:
             enabled: true
-    - repoURL: {{ .Values.source }}
+    - repoURL: {{ .Values.spec.source }}
       targetRevision: HEAD
       path: apps/cert-manager
       kustomize:
