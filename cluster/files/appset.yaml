@@ -9,10 +9,10 @@ spec:
     - "missingkey=error"
   generators:
     - git:
-      repoURL: ssh://git@github.com/mdmsua/tfc.git
-      revision: HEAD
-      directories:
-        - path: charts/*
+        repoURL: ssh://git@github.com/mdmsua/tfc.git
+        revision: HEAD
+        directories:
+          - path: charts/*
   template:
     metadata:
       name: "{{.path.basename}}"
