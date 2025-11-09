@@ -39,6 +39,11 @@ spec:
               groupId: ${oidc_group_id}
             envoyGateway:
               className: envoy-gateway
+              envoyGateway:
+                deployment:
+                  envoyGateway:
+                    imagePullSecrets:
+                      - name: ${docker_hub_auth_key}
             dockerHub:
               authKey: ${docker_hub_auth_key}
       destination:
