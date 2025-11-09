@@ -20,8 +20,8 @@ spec:
         namespace: cert-manager
         patches:
           - target:
-            kind: ClusterIssuer
-            name: default
+              kind: ClusterIssuer
+              name: default
             patch: |-
               - op: replace
                 path: /spec/acme/email
@@ -36,8 +36,8 @@ spec:
                 path: /spec/acme/solvers/0/dns01/cloudflare/apiTokenSecretRef/key
                 value: {{ .Values.cloudflare.apiTokenKey }}
           - target:
-            kind: ExternalSecret
-            name: default
+              kind: ExternalSecret
+              name: default
             patch: |-
               - op: replace
                 path: /spec/secretStoreRef/name
