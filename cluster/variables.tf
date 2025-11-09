@@ -54,8 +54,8 @@ variable "docker_hub_username" {
   default     = "mdmsua"
 }
 
-variable "docker_hub_password" {
-  description = "Docker hub password"
+variable "docker_hub_token" {
+  description = "Docker hub token"
   type        = string
   sensitive   = true
 }

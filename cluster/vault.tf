@@ -47,7 +47,7 @@ resource "azurerm_key_vault_secret" "cloudflare_api_token" {
 resource "azurerm_key_vault_secret" "docker_hub_auth" {
   name         = "docker-hub-auth"
   key_vault_id = azurerm_key_vault.main.id
-  value        = base64encode("${var.docker_hub_username}:${var.docker_hub_password}")
+  value        = base64encode("${var.docker_hub_username}:${var.docker_hub_token}")
 
   depends_on = [
     azurerm_role_assignment.key_vault_administrator
