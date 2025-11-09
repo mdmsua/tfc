@@ -1,5 +1,5 @@
 spec:
-  source:
+  source: ssh://git@github.com/mdmsua/tfc.git
   destination:
     server: https://kubernetes.default.svc
 
@@ -19,6 +19,9 @@ cloudflare:
 
 certManager:
   version: "v1.19.1"
+  acme:
+    email: acme@dmmo.io
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
 
 haproxy:
   version: "1.46.0"
