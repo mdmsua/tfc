@@ -5,29 +5,47 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    chart: external-dns
-    repoURL: https://kubernetes-sigs.github.io/external-dns
-    targetRevision: {{ .Values.externalDns.version }}
-    helm:
-      valuesObject:
-        service:
-          ipFamilyPolicy: PreferDualStack
-          ipFamilies:
-            - IPv4
-            - IPv6
-        deploymentStrategy:
-          type: RollingUpdate
-        provider:
-          name: cloudflare
-        env:
-          - name: CF_API_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.cloudflare.secretName }}
-                key: {{ .Values.cloudflare.apiTokenKey }}
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/external-dns
+      chart: external-dns
+      targetRevision: {{ .Values.externalDns.version }}
+      helm:
+        valuesObject:
+          service:
+            ipFamilyPolicy: PreferDualStack
+            ipFamilies:
+              - IPv4
+              - IPv6
+          deploymentStrategy:
+            type: RollingUpdate
+          provider:
+            name: cloudflare
+          env:
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cloudflare.secretName }}
+                  key: {{ .Values.cloudflare.apiTokenKey }}
+    - repoURL: {{ .Values.spec.source }}
+      targetRevision: HEAD
+      path: apps/external-dns
+      kustomize:
+        namespace: external-dns
+        patches:
+          - target:
+              kind: ExternalSecret
+            patch: |-
+              - op: replace
+                path: /spec/secretStoreRef/name
+                value: {{ .Values.externalSecrets.secretStoreName }}
+              - op: replace
+                path: /spec/data/0/secretKey
+                value: {{ .Values.cloudflare.apiTokenKey }}
+              - op: replace
+                path: /spec/data/0/remoteRef/key
+                value: {{ .Values.cloudflare.remoteKey }}
   destination:
-    server: {{ .Values.spec.destination.server }}
+    name: in-cluster
     namespace: external-dns
   syncPolicy:
     automated:
@@ -39,21 +57,3 @@ spec:
       - ApplyOutOfSyncOnly=true
       - ServerSideApply=true
       - PruneLast=true
----
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: {{ .Values.cloudflare.secretName }}
-  namespace: external-dns
-  labels:
-    app.kubernetes.io/instance: external-dns
-spec:
-  secretStoreRef:
-    name: {{ .Values.externalSecrets.secretStoreName }}
-    kind: ClusterSecretStore
-  data:
-    - secretKey: {{ .Values.cloudflare.apiTokenKey }}
-      remoteRef:
-        key: {{ .Values.cloudflare.remoteKey }}
-  refreshPolicy: Periodic
-  refreshInterval: 5m
