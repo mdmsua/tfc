@@ -23,12 +23,11 @@ spec:
             kubernetesGateway:
               enabled: true
               gatewayControllerName: haproxy.org/gateway-controller
-    
-    - repoURL: ssh://git@github.com/mdmsua/tfc.git
-      path: apps/templates/haproxy-ingress
+    - repoURL: {{ .Values.spec.source }}
+      path: apps/haproxy-ingress
       targetRevision: HEAD
   destination:
-    server: {{ .Values.spec.destination.server }}
+    name: in-cluster
     namespace: haproxy-controller
   syncPolicy:
     automated:
