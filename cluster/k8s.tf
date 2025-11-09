@@ -180,6 +180,7 @@ resource "kubectl_manifest" "appset" {
     oidc_tenant_id             = data.azurerm_client_config.main.tenant_id
     oidc_client_id             = azuread_application.argocd.client_id
     oidc_group_id              = azuread_group.argocd_admins.object_id
+    docker_hub_auth_key        = azurerm_key_vault_secret.docker_hub_auth.name
   })
 
   depends_on = [helm_release.argocd]

@@ -39,6 +39,8 @@ spec:
               groupId: ${oidc_group_id}
             envoyGateway:
               className: envoy-gateway
+            dockerHub:
+              authKey: ${docker_hub_auth_key}
       destination:
         name: in-cluster
         namespace: "{{.path.basename}}"

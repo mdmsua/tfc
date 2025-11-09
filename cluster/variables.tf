@@ -47,3 +47,15 @@ variable "domain" {
   type        = string
   default     = "dmmo.io"
 }
+
+variable "docker_hub_username" {
+  description = "Docker hub username"
+  type        = string
+  default     = "mdmsua"
+}
+
+variable "docker_hub_password" {
+  description = "Docker hub password"
+  type        = string
+  sensitive   = true
+}
