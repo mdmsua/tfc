@@ -21,7 +21,7 @@ spec:
         patches:
           - target:
               kind: ClusterIssuer
-              name: default
+              name: letsencrypt
             patch: |-
               - op: replace
                 path: /spec/acme/email
@@ -37,7 +37,7 @@ spec:
                 value: {{ .Values.cloudflare.apiTokenKey }}
           - target:
               kind: ExternalSecret
-              name: default
+              name: cloudflare
             patch: |-
               - op: replace
                 path: /spec/secretStoreRef/name
