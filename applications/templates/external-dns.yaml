@@ -57,6 +57,9 @@ spec:
                 - secretKey: {{ .Values.cloudflare.apiTokenKey }}
                   remoteRef:
                     key: {{ .Values.cloudflare.remoteKey }}
+                    conversionStrategy: Default	
+                    decodingStrategy: None
+                    metadataPolicy: None
               refreshPolicy: Periodic
               refreshInterval: 5m
   
