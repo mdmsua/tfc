@@ -27,7 +27,7 @@ resource "tfe_workspace" "main" {
   auto_apply_run_trigger         = true
   auto_destroy_activity_duration = lookup(each.value, "ttl", null)
   working_directory              = lookup(each.value, "directory", each.key)
-  terraform_version              = "~> 1.13.0"
+  terraform_version              = "~> 1.14.0"
   auto_apply                     = true
 
   vcs_repo {
