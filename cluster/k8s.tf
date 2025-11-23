@@ -111,15 +111,7 @@ resource "helm_release" "argocd" {
   repository       = "https://argoproj.github.io/argo-helm/"
   chart            = "argo-cd"
   namespace        = "argocd"
-  version          = var.argocd_version
   create_namespace = true
-
-  values = [
-    templatefile("${path.module}/files/argocd.yaml", {
-      oidc_client_id = azuread_application.argocd.client_id
-      domain         = "argocd.${var.domain}"
-    })
-  ]
 }
 
 data "github_repository" "main" {
@@ -157,8 +149,8 @@ resource "kubernetes_secret_v1" "repository" {
   depends_on = [helm_release.argocd]
 }
 
-resource "kubectl_manifest" "apps" {
-  yaml_body = templatefile("${path.module}/files/apps.yaml", {
+resource "kubectl_manifest" "seed" {
+  yaml_body = templatefile("${path.module}/files/seed.yaml", {
     external_secrets_client_id = azurerm_user_assigned_identity.external_secrets.client_id
     key_vault_url              = azurerm_key_vault.main.vault_uri
     cloudflare_remote_key      = azurerm_key_vault_secret.cloudflare_api_token.name

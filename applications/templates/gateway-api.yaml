@@ -10,7 +10,7 @@ spec:
     repoURL: https://github.com/kubernetes-sigs/gateway-api.git
     targetRevision: {{ .Values.gatewayApi.version }}
   destination:
-    server: {{ .Values.spec.destination.server }}
+    name: in-cluster
     namespace: default
   syncPolicy:
     automated:

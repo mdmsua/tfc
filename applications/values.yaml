@@ -1,0 +1,27 @@
+nginx:
+  version: 4.14.0
+
+externalSecrets:
+  version: 1.1.0
+  secretStoreName: azure
+
+externalDns:
+  version: 1.18.0
+
+cloudflare:
+  secretName: cloudflare
+  apiTokenKey: api-token
+
+certManager:
+  version: v1.19.1
+  email: acme@dmmo.io
+  server: https://acme-v02.api.letsencrypt.org/directory
+
+haproxy:
+  version: 1.46.0
+
+gatewayApi:
+  version: v1.4.0
+
+argocd:
+  version: 9.0.5

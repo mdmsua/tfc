@@ -5,6 +5,19 @@ metadata:
   namespace: argocd
 spec:
   project: default
+  destination:
+    name: in-cluster
+    namespace: haproxy-controller
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - PruneLast=true
   sources:
     - repoURL: https://haproxytech.github.io/helm-charts
       chart: kubernetes-ingress
@@ -20,22 +33,3 @@ spec:
               ipFamilies:
                 - IPv4
                 - IPv6
-            kubernetesGateway:
-              enabled: true
-              gatewayControllerName: haproxy.org/gateway-controller
-    - repoURL: {{ .Values.spec.source }}
-      path: apps/haproxy-ingress
-      targetRevision: HEAD
-  destination:
-    name: in-cluster
-    namespace: haproxy-controller
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-      allowEmpty: true
-    syncOptions:
-      - CreateNamespace=true
-      - ApplyOutOfSyncOnly=true
-      - ServerSideApply=true
-      - PruneLast=true

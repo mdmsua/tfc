@@ -18,12 +18,6 @@ variable "kubernetes_version" {
   default     = "1.33"
 }
 
-variable "argocd_version" {
-  description = "ArgoCD version"
-  type        = string
-  default     = "9.0.5"
-}
-
 variable "admins" {
   description = "Admins"
   type        = list(string)

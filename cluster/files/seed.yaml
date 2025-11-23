@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: apps
+  name: seed
   namespace: argocd
 spec:
   project: default
   destination:
-    server: https://kubernetes.default.svc
+    name: in-cluster
     namespace: argocd
   syncPolicy:
     automated:
@@ -20,7 +20,7 @@ spec:
   source:
     repoURL: ssh://git@github.com/mdmsua/tfc.git
     targetRevision: HEAD
-    path: apps
+    path: applications
     helm:
       valueFiles:
         - values.yaml

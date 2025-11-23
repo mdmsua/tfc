@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    name: in-cluster
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - PruneLast=true
+  sources:
+    - repoURL: oci://quay.io/jetstack/charts/cert-manager
+      chart: cert-manager
+      targetRevision: {{ .Values.certManager.version }}
+      helm:
+        valuesObject:
+          crds:
+            enabled: true
+    - chart: raw
+      repoURL: https://bedag.github.io/helm-charts/
+      targetRevision: "2.0.2"
+      helm:
+        valuesObject:
+          resources:
+          - apiVersion: external-secrets.io/v1
+            kind: ExternalSecret
+            metadata:
+              name: cloudflare
+            spec:
+              secretStoreRef:
+                name: {{ .Values.externalSecrets.secretStoreName }}
+                kind: ClusterSecretStore
+              data:
+                - secretKey: {{ .Values.cloudflare.apiTokenKey }}
+                  remoteRef:
+                    key: {{ .Values.cloudflare.remoteKey }}
+              refreshPolicy: Periodic
+              refreshInterval: 5m
+          - apiVersion: cert-manager.io/v1
+            kind: ClusterIssuer
+            metadata:
+              name: letsencrypt
+            spec:
+              acme:
+                email: {{ .Values.certManager.email }}
+                server: {{ .Values.certManager.server }}
+                privateKeySecretRef:
+                  name: letsencrypt
+                solvers:
+                  - dns01:
+                      cloudflare:
+                        apiTokenSecretRef:
+                          name: {{ .Values.cloudflare.secretName }}
+                          key: {{ .Values.cloudflare.apiTokenKey }}
+  

@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    name: in-cluster
+    namespace: external-dns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - PruneLast=true
+  sources:
+    - repoURL: https://kubernetes-sigs.github.io/external-dns
+      chart: external-dns
+      targetRevision: {{ .Values.externalDns.version }}
+      helm:
+        valuesObject:
+          service:
+            ipFamilyPolicy: PreferDualStack
+            ipFamilies:
+              - IPv4
+              - IPv6
+          deploymentStrategy:
+            type: RollingUpdate
+          provider:
+            name: cloudflare
+          env:
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cloudflare.secretName }}
+                  key: {{ .Values.cloudflare.apiTokenKey }}
+    - chart: raw
+      repoURL: https://bedag.github.io/helm-charts/
+      targetRevision: "2.0.2"
+      helm:
+        valuesObject:
+          resources:
+          - apiVersion: external-secrets.io/v1
+            kind: ExternalSecret
+            metadata:
+              name: cloudflare
+            spec:
+              secretStoreRef:
+                name: {{ .Values.externalSecrets.secretStoreName }}
+                kind: ClusterSecretStore
+              data:
+                - secretKey: {{ .Values.cloudflare.apiTokenKey }}
+                  remoteRef:
+                    key: {{ .Values.cloudflare.remoteKey }}
+              refreshPolicy: Periodic
+              refreshInterval: 5m
+  

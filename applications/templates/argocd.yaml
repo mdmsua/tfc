@@ -1,0 +1,75 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    name: in-cluster
+    namespace: argocd
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+    - PruneLast=true
+  sources:
+    - chart: argo-cd
+      repoURL: ghcr.io/argoproj/argo-helm
+      targetRevision: {{ .Values.argocd.version }}
+      helm:
+        valuesObject:
+          global:
+            domain: argocd.{{ .Values.domain }}
+          notifications:
+            enabled: false
+          redis-ha:
+            enabled: false
+          repoServer:
+            autoscaling:
+              enabled: true
+              minReplicas: 1
+          configs:
+            cm:
+              admin.enabled: "false"
+              users.anonymous.enabled: "false"
+              oidc.config: |
+                name: Azure
+                issuer: https://login.microsoftonline.com/{{ .Values.oidc.tenantId }}/v2.0
+                clientID: {{ .Values.oidc.clientId }}
+                azure:
+                  useWorkloadIdentity: true
+                requestedIDTokenClaims:
+                  groups:
+                    essential: true
+                requestedScopes:
+                  - openid
+                  - profile
+                  - email
+            rbac:
+              policy.default: role:readonly
+              policy.csv: |
+                g, "{{ .Values.oidc.groupId }}", role:admin
+          server:
+            autoscaling:
+              enabled: true
+              minReplicas: 1
+            podLabels:
+              azure.workload.identity/use: "true"
+            serviceAccount:
+              annotations:
+                azure.workload.identity/client-id: {{ .Values.oidc.clientId }}
+            ingress:
+              enabled: true
+              tls: true
+              ingressClassName: haproxy
+              annotations:
+                haproxy.org/ssl-passthrough: "true"
+                haproxy.org/ssl-redirect: "false"
+                cert-manager.io/cluster-issuer: letsencrypt
+                
+          
