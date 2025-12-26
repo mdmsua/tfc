@@ -14,7 +14,7 @@ data "tfe_project" "main" {
 data "tfe_organization" "main" {}
 
 data "tfe_oauth_client" "main" {
-  oauth_client_id = "oc-oD6NMk4iCHYyEoZu"
+  oauth_client_id = "ot-LtULrZJ8rQraLxoj"
 }
 
 data "azurerm_client_config" "main" {}
