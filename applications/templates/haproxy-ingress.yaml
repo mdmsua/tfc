@@ -94,6 +94,7 @@ spec:
                     - /home/nonroot/rules
                     securityContext:
                       runAsNonRoot: true
+                      runAsUser: 1000
                       allowPrivilegeEscalation: false
                       privileged: false
                       readOnlyRootFilesystem: true
