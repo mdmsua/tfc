@@ -82,7 +82,8 @@ spec:
                   serviceAccountName: modsecurity
                   securityContext:
                     runAsNonRoot: true
-                    runAsUser: 1000
+                    runAsUser: 65532
+                    fsGroup: 65532
                   containers:
                   - image: {{ .Values.registry }}/modsecurity:{{ .Values.modsecurity.version }}
                     name: modsecurity
@@ -95,7 +96,8 @@ spec:
                     - /home/nonroot/rules
                     securityContext:
                       runAsNonRoot: true
-                      runAsUser: 1000
+                      runAsUser: 65532
+                      fsGroup: 65532
                       allowPrivilegeEscalation: false
                       privileged: false
                       readOnlyRootFilesystem: true
