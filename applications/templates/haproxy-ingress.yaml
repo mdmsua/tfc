@@ -82,6 +82,7 @@ spec:
                   serviceAccountName: modsecurity
                   securityContext:
                     runAsNonRoot: true
+                    runAsUser: 1000
                   containers:
                   - image: {{ .Values.registry }}/modsecurity:{{ .Values.modsecurity.version }}
                     name: modsecurity
