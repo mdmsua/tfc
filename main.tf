@@ -16,8 +16,12 @@ data "tfe_organization" "main" {}
 data "azurerm_client_config" "main" {}
 
 resource "tfe_variable_set" "main" {
-  name              = "Azure"
-  parent_project_id = data.tfe_project.main.id
+  name = "Azure"
+}
+
+resource "tfe_project_variable_set" "main" {
+  project_id      = data.tfe_project.main.id
+  variable_set_id = tfe_variable_set.main.id
 }
 
 resource "tfe_workspace" "main" {
