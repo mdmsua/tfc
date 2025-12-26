@@ -15,6 +15,10 @@ data "tfe_organization" "main" {}
 
 data "azurerm_client_config" "main" {}
 
+data "tfe_github_app_installation" "main" {
+  installation_id = var.github_app_installation_id
+}
+
 resource "tfe_variable_set" "main" {
   name              = "Azure"
   parent_project_id = data.tfe_project.main.id
@@ -34,7 +38,7 @@ resource "tfe_workspace" "main" {
   vcs_repo {
     identifier                 = "mdmsua/tfc"
     branch                     = "main"
-    github_app_installation_id = var.github_app_installation_id
+    github_app_installation_id = data.tfe_github_app_installation.main.id
   }
 }
 
