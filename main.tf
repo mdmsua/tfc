@@ -13,6 +13,10 @@ data "tfe_project" "main" {
 
 data "tfe_organization" "main" {}
 
+data "tfe_oauth_client" "main" {
+  oauth_client_id = "oc-KCgcDFcTwXE5Q93R"
+}
+
 data "azurerm_client_config" "main" {}
 
 resource "tfe_variable_set" "main" {
@@ -32,9 +36,9 @@ resource "tfe_workspace" "main" {
   auto_apply                     = true
 
   vcs_repo {
-    identifier                 = "mdmsua/tfc"
-    branch                     = "main"
-    github_app_installation_id = "ghain-h96Ax4WhkEsc8N96"
+    identifier     = "mdmsua/tfc"
+    branch         = "main"
+    oauth_token_id = data.tfe_oauth_client.main.oauth_token_id
   }
 }
 
