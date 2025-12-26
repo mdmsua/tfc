@@ -32,9 +32,9 @@ resource "tfe_workspace" "main" {
   auto_apply                     = true
 
   vcs_repo {
-    identifier     = "mdmsua/tfc"
-    branch         = "main"
-    oauth_token_id = "ot-LtULrZJ8rQraLxoj"
+    identifier                 = "mdmsua/tfc"
+    branch                     = "main"
+    github_app_installation_id = var.github_app_installation_id
   }
 }
 
