@@ -13,12 +13,7 @@ data "tfe_project" "main" {
 
 data "tfe_organization" "main" {}
 
-data "tfe_oauth_client" "main" {
-  oauth_client_id = "ot-LtULrZJ8rQraLxoj"
-}
-
 data "azurerm_client_config" "main" {}
-
 
 resource "tfe_variable_set" "main" {
   name              = "Azure"
@@ -39,7 +34,7 @@ resource "tfe_workspace" "main" {
   vcs_repo {
     identifier     = "mdmsua/tfc"
     branch         = "main"
-    oauth_token_id = data.tfe_oauth_client.main.oauth_token_id
+    oauth_token_id = "ot-LtULrZJ8rQraLxoj"
   }
 }
 
