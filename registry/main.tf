@@ -3,6 +3,13 @@ resource "azurerm_resource_group" "main" {
   location = "germanywestcentral"
 }
 
+module "naming" {
+  source  = "Azure/naming/azurerm"
+  version = "0.4.2"
+  suffix  = ["tfc", "gwc"]
+}
+
+
 resource "azurerm_container_registry" "main" {
   name                   = azurerm_resource_group.main.name
   resource_group_name    = azurerm_resource_group.main.name
@@ -10,6 +17,25 @@ resource "azurerm_container_registry" "main" {
   admin_enabled          = false
   anonymous_pull_enabled = false
   sku                    = "Basic"
+}
+
+resource "azurerm_user_assigned_identity" "push" {
+  name                = "${module.naming.user_assigned_identity.name}-push"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+}
+
+data "github_repository" "main" {
+  full_name = "mdmsua/tfc"
+}
+
+resource "azurerm_federated_identity_credential" "push" {
+  name                = "github"
+  parent_id           = azurerm_user_assigned_identity.push.id
+  resource_group_name = azurerm_user_assigned_identity.push.resource_group_name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = "https://token.actions.githubusercontent.com"
+  subject             = "repo:${data.github_repository.main.full_name}:ref:refs/heads/main"
 }
 
 resource "azurerm_container_registry_task" "agent" {
@@ -41,48 +67,6 @@ resource "azurerm_container_registry_task" "agent" {
     custom {
       login_server = azurerm_container_registry.main.login_server
       identity     = "[system]"
-    }
-  }
-}
-
-resource "azurerm_container_registry_task" "modsecurity" {
-  name                  = "modsecurity"
-  container_registry_id = azurerm_container_registry.main.id
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  platform {
-    os           = "Linux"
-    architecture = "arm64"
-  }
-
-  docker_step {
-    dockerfile_path      = "images/modsecurity/Dockerfile"
-    context_path         = "https://github.com/mdmsua/tfc"
-    context_access_token = var.github_token
-    image_names          = ["modsecurity:${var.modsecurity_version}"]
-
-    arguments = {
-      VERSION = var.modsecurity_version
-    }
-  }
-
-  timer_trigger {
-    name     = "daily"
-    schedule = "0 0 * * *"
-  }
-
-  registry_credential {
-    custom {
-      login_server = azurerm_container_registry.main.login_server
-      identity     = "[system]"
-    }
-    custom {
-      login_server = "dhi.io"
-      username     = "mdmsua"
-      password     = var.docker_hub_token
     }
   }
 }
@@ -134,10 +118,10 @@ resource "azurerm_role_assignment" "agent_container_registry_repository_writer" 
 EOF
 }
 
-resource "azurerm_role_assignment" "modsecurity_container_registry_repository_writer" {
+resource "azurerm_role_assignment" "push_container_registry_repository_writer" {
   scope                = azurerm_container_registry.main.id
   role_definition_name = "Container Registry Repository Writer"
-  principal_id         = azurerm_container_registry_task.modsecurity.identity[0].principal_id
+  principal_id         = azurerm_user_assigned_identity.push.principal_id
   principal_type       = "ServicePrincipal"
   condition_version    = "2.0"
   condition            = <<EOF
@@ -153,4 +137,29 @@ resource "azurerm_role_assignment" "modsecurity_container_registry_repository_wr
  )
 )
 EOF
+}
+
+resource "github_actions_secret" "docker" {
+  repository      = data.github_repository.main.name
+  secret_name     = "DOCKER_TOKEN"
+  plaintext_value = var.docker_hub_token
+}
+
+data "azurerm_client_config" "main" {}
+
+locals {
+  variables = {
+    CLIENT_ID       = azurerm_user_assigned_identity.push.client_id
+    TENANT_ID       = data.azurerm_client_config.main.tenant_id
+    SUBSCRIPTION_ID = data.azurerm_client_config.main.subscription_id
+    REGISTRY        = azurerm_container_registry.main.login_server
+  }
+}
+
+resource "github_actions_variable" "main" {
+  for_each = local.variables
+
+  repository    = data.github_repository.main.name
+  variable_name = each.key
+  value         = each.value
 }

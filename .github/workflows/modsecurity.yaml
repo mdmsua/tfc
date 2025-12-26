@@ -1,0 +1,84 @@
+name: Build and push ModSecurity image
+run-name: Build and push ${{ vars.REGISTRY}}/modsecurity:${{ inputs.version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: ModSecurity version to build
+
+env:
+  PLATFORMS: linux/arm64,linux/amd64
+
+jobs:
+  image:
+    name: Build and push ModSecurity image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # 6.0.1
+        with:
+          sparse-checkout: images/modsecurity
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # 3.7.0
+        with:
+          platforms: ${{ env.PLATFORMS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # 3.12.0
+
+      - name: Extract metadata for image
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # 5.10.0
+        with:
+          images: ${{ vars.REGISTRY }}/modsecurity
+          tags: |
+            type=semver,pattern={{version}},value=${{ inputs.version }}
+
+      - name: Azure login
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # 2.3.0
+        with:
+          client-id: ${{ vars.CLIENT_ID }}
+          tenant-id: ${{ vars.TENANT_ID }}
+          subscription-id: ${{ vars.SUBSCRIPTION_ID }}
+
+      - name: Get access token for ${{ vars.REGISTRY }}
+        id: auth
+        run: |
+          TOKEN=$(az acr login --name ${{ vars.REGISTRY }} --expose-token --output tsv --query accessToken)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Log into ${{ vars.REGISTRY }}
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # 3.6.0
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: 00000000-0000-0000-0000-000000000000
+          password: ${{ steps.auth.outputs.token }}
+
+      - name: Log into dhi.io
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # 3.6.0
+        with:
+          registry: dhi.io
+          username: ${{ github.repository_owner}}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Log into hub.docker.io
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # 3.6.0
+        with:
+          username: ${{ github.repository_owner}}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push container images to ${{ vars.REGISTRY }}
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # 6.18.0
+        with:
+          context: images/modsecurity
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ env.PLATFORMS }}
+          build-args: |
+            VERSION=${{ inputs.version }}

@@ -6,11 +6,13 @@ WORKDIR /tmp
 
 ADD https://github.com/coreruleset/coreruleset/releases/download/v${VERSION}/coreruleset-${VERSION}-minimal.tar.gz coreruleset.tar.gz
 
-RUN tar -xzf coreruleset.tar.gz
-RUN mv coreruleset-${VERSION}/rules /tmp
-RUN mv coreruleset-${VERSION}/crs-setup.conf.example /tmp/rules/crs-setup.conf
-RUN rm coreruleset.tar.gz
-RUN rm -r coreruleset-${VERSION}
+RUN <<EOF
+    tar -xzf coreruleset.tar.gz
+    mv coreruleset-${VERSION}/rules /tmp
+    mv coreruleset-${VERSION}/crs-setup.conf.example /tmp/rules/crs-setup.conf
+    rm coreruleset.tar.gz
+    rm -r coreruleset-${VERSION}
+EOF
 
 ADD https://raw.githubusercontent.com/owasp-modsecurity/ModSecurity/v3/master/unicode.mapping /tmp/rules/unicode.mapping
 ADD https://raw.githubusercontent.com/owasp-modsecurity/ModSecurity/v3/master/modsecurity.conf-recommended /tmp/rules/modsecurity.conf

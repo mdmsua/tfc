@@ -10,12 +10,6 @@ variable "contributors" {
   default     = ["6b1aa092-b266-49f3-be05-341fff39cd59"]
 }
 
-variable "modsecurity_version" {
-  description = "ModSecurity version"
-  type        = string
-  default     = "4.21.0"
-}
-
 variable "docker_hub_token" {
   description = "Access token to docker hub"
   type        = string
