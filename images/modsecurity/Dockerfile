@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.3
+
 FROM alpine:latest AS base
 
 ARG VERSION=4.21.0
