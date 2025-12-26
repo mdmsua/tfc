@@ -60,6 +60,10 @@ resource "azurerm_container_registry_task" "modsecurity" {
   }
 }
 
+resource "azurerm_container_registry_task_schedule_run_now" "modsecurity" {
+  container_registry_task_id = azurerm_container_registry_task.modsecurity.id
+}
+
 moved {
   from = azurerm_container_registry_task.main
   to   = azurerm_container_registry_task.agent
