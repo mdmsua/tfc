@@ -36,6 +36,13 @@ resource "azurerm_container_registry_task" "agent" {
     name     = "daily"
     schedule = "0 0 * * *"
   }
+
+  registry_credential {
+    custom {
+      login_server = azurerm_container_registry.main.login_server
+      identity     = "[system]"
+    }
+  }
 }
 
 resource "azurerm_container_registry_task" "modsecurity" {
@@ -66,18 +73,15 @@ resource "azurerm_container_registry_task" "modsecurity" {
     name     = "daily"
     schedule = "0 0 * * *"
   }
+
+  registry_credential {
+    custom {
+      login_server = azurerm_container_registry.main.login_server
+      identity     = "[system]"
+    }
+  }
 }
 
-resource "azurerm_container_registry_task_schedule_run_now" "modsecurity" {
-  container_registry_task_id = azurerm_container_registry_task.modsecurity.id
-
-  depends_on = [azurerm_role_assignment.modsecurity_container_registry_repository_writer]
-}
-
-moved {
-  from = azurerm_container_registry_task.main
-  to   = azurerm_container_registry_task.agent
-}
 resource "azapi_update_resource" "registry_role_assignment_mode" {
   type        = "Microsoft.ContainerRegistry/registries@2025-04-01"
   resource_id = azurerm_container_registry.main.id
