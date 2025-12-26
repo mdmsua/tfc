@@ -16,8 +16,8 @@ variable "modsecurity_version" {
   default     = "4.21.0"
 }
 
-variable "dhi_token" {
-  description = "Access token to dhi.io"
+variable "docker_hub_token" {
+  description = "Access token to docker hub"
   type        = string
   sensitive   = true
 }

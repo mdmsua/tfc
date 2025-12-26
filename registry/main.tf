@@ -82,7 +82,7 @@ resource "azurerm_container_registry_task" "modsecurity" {
     custom {
       login_server = "dhi.io"
       username     = "mdmsua"
-      password     = var.dhi_token
+      password     = var.docker_hub_token
     }
   }
 }
