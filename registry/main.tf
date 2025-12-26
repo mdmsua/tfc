@@ -71,14 +71,13 @@ resource "azurerm_container_registry_task" "modsecurity" {
 resource "azurerm_container_registry_task_schedule_run_now" "modsecurity" {
   container_registry_task_id = azurerm_container_registry_task.modsecurity.id
 
-  # depends_on = [azurerm_role_assignment.modsecurity_container_registry_repository_writer]
+  depends_on = [azurerm_role_assignment.modsecurity_container_registry_repository_writer]
 }
 
 moved {
   from = azurerm_container_registry_task.main
   to   = azurerm_container_registry_task.agent
 }
-
 resource "azapi_update_resource" "registry_role_assignment_mode" {
   type        = "Microsoft.ContainerRegistry/registries@2025-04-01"
   resource_id = azurerm_container_registry.main.id
@@ -105,44 +104,44 @@ resource "azurerm_role_assignment" "container_registry_repository_contributor" {
   principal_id         = each.key
 }
 
-# resource "azurerm_role_assignment" "agent_container_registry_repository_writer" {
-#   scope                = azurerm_container_registry.main.id
-#   role_definition_name = "Container Registry Repository Writer"
-#   principal_id         = azurerm_container_registry_task.agent.identity[0].principal_id
-#   principal_type       = "ServicePrincipal"
-#   condition_version    = "2.0"
-#   condition            = <<EOF
-#   (
-#  (
-#   !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/content/write'})
-#   AND
-#   !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/metadata/write'})
-#  )
-#  OR 
-#  (
-#   @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'tfc-agent'
-#  )
-# )
-# EOF
-# }
+resource "azurerm_role_assignment" "agent_container_registry_repository_writer" {
+  scope                = azurerm_container_registry.main.id
+  role_definition_name = "Container Registry Repository Writer"
+  principal_id         = azurerm_container_registry_task.agent.identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+  condition_version    = "2.0"
+  condition            = <<EOF
+  (
+ (
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/content/write'})
+  AND
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/metadata/write'})
+ )
+ OR 
+ (
+  @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'tfc-agent'
+ )
+)
+EOF
+}
 
-# resource "azurerm_role_assignment" "modsecurity_container_registry_repository_writer" {
-#   scope                = azurerm_container_registry.main.id
-#   role_definition_name = "Container Registry Repository Writer"
-#   principal_id         = azurerm_container_registry_task.modsecurity.identity[0].principal_id
-#   principal_type       = "ServicePrincipal"
-#   condition_version    = "2.0"
-#   condition            = <<EOF
-#   (
-#  (
-#   !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/content/write'})
-#   AND
-#   !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/metadata/write'})
-#  )
-#  OR 
-#  (
-#   @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'modsecurity'
-#  )
-# )
-# EOF
-# }
+resource "azurerm_role_assignment" "modsecurity_container_registry_repository_writer" {
+  scope                = azurerm_container_registry.main.id
+  role_definition_name = "Container Registry Repository Writer"
+  principal_id         = azurerm_container_registry_task.modsecurity.identity[0].principal_id
+  principal_type       = "ServicePrincipal"
+  condition_version    = "2.0"
+  condition            = <<EOF
+  (
+ (
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/content/write'})
+  AND
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/metadata/write'})
+ )
+ OR 
+ (
+  @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'modsecurity'
+ )
+)
+EOF
+}
