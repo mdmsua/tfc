@@ -155,6 +155,7 @@ resource "kubectl_manifest" "seed" {
     key_vault_url              = azurerm_key_vault.main.vault_uri
     cloudflare_remote_key      = azurerm_key_vault_secret.cloudflare_api_token.name
     domain                     = var.domain
+    registry                   = var.container_registry_server
     oidc_tenant_id             = data.azurerm_client_config.main.tenant_id
     oidc_client_id             = azuread_application.argocd.client_id
     oidc_group_id              = azuread_group.argocd_admins.object_id

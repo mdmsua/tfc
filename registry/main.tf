@@ -148,18 +148,34 @@ resource "github_actions_secret" "docker" {
 data "azurerm_client_config" "main" {}
 
 locals {
-  variables = {
+  actions_variables = {
     CLIENT_ID       = azurerm_user_assigned_identity.push.client_id
     TENANT_ID       = data.azurerm_client_config.main.tenant_id
     SUBSCRIPTION_ID = data.azurerm_client_config.main.subscription_id
     REGISTRY        = azurerm_container_registry.main.login_server
   }
+  tfe_variables = {
+    container_registry_server = azurerm_container_registry.main.login_server
+  }
 }
 
 resource "github_actions_variable" "main" {
-  for_each = local.variables
+  for_each = local.actions_variables
 
   repository    = data.github_repository.main.name
   variable_name = each.key
   value         = each.value
+}
+
+data "tfe_variable_set" "azure" {
+  name = "Azure"
+}
+
+resource "tfe_variable" "azure" {
+  for_each = local.tfe_variables
+
+  category        = "terraform"
+  key             = each.key
+  value           = each.value
+  variable_set_id = data.tfe_variable_set.azure.id
 }

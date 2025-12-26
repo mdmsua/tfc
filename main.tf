@@ -19,6 +19,12 @@ data "tfe_oauth_client" "main" {
 
 data "azurerm_client_config" "main" {}
 
+
+resource "tfe_variable_set" "main" {
+  name              = "Azure"
+  parent_project_id = data.tfe_project.main.id
+}
+
 resource "tfe_workspace" "main" {
   for_each                       = local.workspaces
   name                           = each.key

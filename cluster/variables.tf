@@ -53,3 +53,8 @@ variable "docker_hub_token" {
   type        = string
   sensitive   = true
 }
+
+variable "container_registry_server" {
+  description = "Container registry server"
+  type        = string
+}
