@@ -15,3 +15,9 @@ variable "modsecurity_version" {
   type        = string
   default     = "4.21.0"
 }
+
+variable "dhi_token" {
+  description = "Access token to dhi.io"
+  type        = string
+  sensitive   = true
+}

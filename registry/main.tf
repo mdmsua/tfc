@@ -79,6 +79,11 @@ resource "azurerm_container_registry_task" "modsecurity" {
       login_server = azurerm_container_registry.main.login_server
       identity     = "[system]"
     }
+    custom {
+      login_server = "dhi.io"
+      username     = "mdmsua"
+      password     = var.dhi_token
+    }
   }
 }
 
