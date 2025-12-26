@@ -59,6 +59,11 @@ variable "container_registry_server" {
   type        = string
 }
 
+variable "container_registry_id" {
+  description = "Container registry ID"
+  type        = string
+}
+
 variable "github_app_id" {
   description = "GitHub app ID"
   type        = string
