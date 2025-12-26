@@ -26,7 +26,7 @@ resource "azurerm_user_assigned_identity" "push" {
 }
 
 data "github_repository" "main" {
-  full_name = "mdmsua/tfc"
+  name = "tfc"
 }
 
 resource "azurerm_federated_identity_credential" "push" {
