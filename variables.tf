@@ -11,8 +11,3 @@ variable "tfc_azure_dynamic_credentials" {
     }))
   })
 }
-
-variable "github_app_installation_id" {
-  description = "GitHub app installation ID"
-  type        = string
-}
