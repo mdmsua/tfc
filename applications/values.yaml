@@ -15,7 +15,7 @@ certManager:
   server: https://acme-v02.api.letsencrypt.org/directory
 
 haproxy:
-  version: 1.46.0
+  version: 1.47.3
 
 gatewayApi:
   version: v1.4.0
