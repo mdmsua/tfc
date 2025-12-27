@@ -86,6 +86,7 @@ spec:
                     fsGroup: 65532
                   containers:
                   - image: {{ .Values.registry }}/modsecurity:{{ .Values.modsecurity.version }}
+                    imagePullPolicy: Always
                     name: modsecurity
                     args:
                     - create
