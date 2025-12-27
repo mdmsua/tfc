@@ -70,7 +70,6 @@ spec:
               annotations:
                 haproxy.org/ssl-passthrough: "true"
                 haproxy.org/ssl-redirect: "false"
-                haproxy.org/server-proto: "h2"
                 haproxy.org/modsecurity: haproxy-controller/modsecurity
                 cert-manager.io/cluster-issuer: letsencrypt
                 
