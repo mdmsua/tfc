@@ -38,7 +38,7 @@ spec:
                 - IPv6
             extraContainers:
               - name: coraza
-                image: ghcr.io/corazawaf/coraza-spoa:0.5.0
+                image: ghcr.io/mdmsua/coraza-spoa:snapshot
                 imagePullPolicy: Always
                 command:
                   - /coraza-spoa
