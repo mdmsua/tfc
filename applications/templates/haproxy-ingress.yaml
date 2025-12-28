@@ -27,6 +27,7 @@ spec:
       helm:
         valuesObject:
           controller:
+            kind: DaemonSet
             service:
               annotations:
                 service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
@@ -131,7 +132,7 @@ spec:
                     messages request
               haproxy-aux.cfg: |
                 backend coraza
-                option spop-check
-                mode tcp
-                server coraza coraza:9000 check
+                  option spop-check
+                  mode tcp
+                  server coraza 127.0.0.1:9000 check
           
