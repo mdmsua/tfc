@@ -64,7 +64,6 @@ spec:
             extraVolumeMounts:
               - name: haproxy
                 mountPath: /usr/local/etc/haproxy
-                readOnly: false
             extraVolumes:
               - name: coraza
                 configMap:
