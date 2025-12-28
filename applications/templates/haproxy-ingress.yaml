@@ -51,16 +51,16 @@ spec:
                 volumeMounts:
                 - name: coraza
                   mountPath: /etc/coraza
-                securityContext:
-                  runAsNonRoot: true
-                  runAsUser: 1000
-                  runAsGroup: 1000
-                  allowPrivilegeEscalation: false
-                  privileged: false
-                  readOnlyRootFilesystem: true
-                  capabilities:
-                    drop:
-                    - ALL
+                # securityContext:
+                #   runAsNonRoot: true
+                #   runAsUser: 1000
+                #   runAsGroup: 1000
+                #   allowPrivilegeEscalation: false
+                #   privileged: false
+                #   readOnlyRootFilesystem: true
+                #   capabilities:
+                #     drop:
+                #     - ALL
             extraVolumeMounts:
               - name: haproxy
                 mountPath: /usr/local/etc/haproxy
