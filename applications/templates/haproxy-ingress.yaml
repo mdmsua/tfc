@@ -86,7 +86,7 @@ spec:
             metadata:
               name: coraza
             data:
-              config.yaml:
+              config.yaml: |
                 bind: 0.0.0.0:9000
                 log_level: info
                 log_file: /dev/stdout
