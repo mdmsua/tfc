@@ -62,7 +62,7 @@ spec:
                     drop:
                     - ALL
             extraVolumeMounts:
-              - name: hapoxy
+              - name: haproxy
                 mountPath: /usr/local/etc/haproxy
             extraVolumes:
               - name: coraza
