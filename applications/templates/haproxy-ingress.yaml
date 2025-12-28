@@ -49,7 +49,7 @@ spec:
                   containerPort: 9000
                   protocol: TCP
                 volumeMounts:
-                - name: config
+                - name: coraza
                   mountPath: /etc/coraza
                 securityContext:
                   runAsNonRoot: true
@@ -62,8 +62,6 @@ spec:
                     drop:
                     - ALL
             extraVolumeMounts:
-              - name: coraza
-                mountPath: /etc/coraza
               - name: hapoxy
                 mountPath: /usr/local/etc/haproxy
             extraVolumes:
