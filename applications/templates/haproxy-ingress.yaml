@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: haproxy-ingress
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -30,9 +32,49 @@ spec:
                 service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
               type: LoadBalancer
               ipFamilyPolicy: PreferDualStack
+              externalTrafficPolicy: Local
               ipFamilies:
                 - IPv4
                 - IPv6
+            extraContainers:
+              - name: coraza
+                image: ghcr.io/corazawaf/coraza-spoa:0.5.0
+                imagePullPolicy: Always
+                command:
+                  - /coraza-spoa
+                  - --config=/etc/coraza/config.yaml
+                  - --autoreload
+                ports:
+                - name: spoa
+                  containerPort: 9000
+                  protocol: TCP
+                volumeMounts:
+                - name: config
+                  mountPath: /etc/coraza
+                securityContext:
+                  runAsNonRoot: true
+                  runAsUser: 1000
+                  runAsGroup: 1000
+                  allowPrivilegeEscalation: false
+                  privileged: false
+                  readOnlyRootFilesystem: true
+                  capabilities:
+                    drop:
+                    - ALL
+            extraVolumeMounts:
+              - name: coraza
+                mountPath: /etc/coraza
+              - name: hapoxy
+                mountPath: /usr/local/etc/haproxy
+            extraVolumes:
+              - name: coraza
+                configMap:
+                  name: coraza
+                  optional: false
+              - name: haproxy
+                configMap:
+                  name: haproxy
+                  optional: false
     - chart: raw
       repoURL: https://bedag.github.io/helm-charts/
       targetRevision: 2.0.2
@@ -40,69 +82,58 @@ spec:
         valuesObject:
           resources:
           - apiVersion: v1
-            kind: ServiceAccount
+            kind: ConfigMap
             metadata:
-              name: modsecurity
-          - apiVersion: rbac.authorization.k8s.io/v1
-            kind: Role
+              name: coraza
+            data:
+              config.yaml:
+                bind: 0.0.0.0:9000
+                log_level: info
+                log_file: /dev/stdout
+                log_format: console
+                default_application: default
+                applications:
+                  - name: default
+                    directives: |
+                      Include @coraza.conf-recommended
+                      Include @crs-setup.conf.example
+                      Include @owasp_crs/*.conf
+                      SecRuleEngine On
+                    response_check: false
+                    transaction_ttl_ms: 60000
+                    log_level: info
+                    log_file: /dev/stdout
+                    log_format: console
+          - apiVersion: v1
+            kind: ConfigMap
             metadata:
-              name: secret-editor
-            rules:
-            - apiGroups:
-              - ""
-              resources:
-              - secrets
-              verbs:
-              - get
-              - list
-              - watch
-              - create
-              - update
-              - patch
-              - delete
-          - apiVersion: rbac.authorization.k8s.io/v1
-            kind: RoleBinding
-            metadata:
-              name: modsecurity-secret-editor
-            subjects:
-            - kind: ServiceAccount
-              name: modsecurity
-            roleRef:
-              kind: Role
-              name: secret-editor
-          - apiVersion: batch/v1
-            kind: Job
-            metadata:
-              name: modsecurity
-            spec:
-              template:
-                metadata:
-                  name: modsecurity
-                spec:
-                  serviceAccountName: modsecurity
-                  securityContext:
-                    runAsNonRoot: true
-                    runAsUser: 65532
-                    fsGroup: 65532
-                  containers:
-                  - image: {{ .Values.registry }}/modsecurity:{{ .Values.modsecurity.version }}
-                    imagePullPolicy: Always
-                    name: modsecurity
-                    args:
-                    - create
-                    - secret
-                    - generic
-                    - modsecurity
-                    - --from-file
-                    - /home/nonroot/rules
-                    securityContext:
-                      runAsNonRoot: true
-                      runAsUser: 65532
-                      runAsGroup: 65532
-                      allowPrivilegeEscalation: false
-                      privileged: false
-                      readOnlyRootFilesystem: true
-                      capabilities:
-                        drop:
-                        - ALL
-                  restartPolicy: OnFailure
+              name: haproxy
+            data:
+              coraza.cfg: |
+                [coraza]
+                spoe-agent coraza
+                    #messages   response
+                    groups      request
+                    option      var-prefix      coraza
+                    option      set-on-error    error
+                    timeout     hello           2s
+                    timeout     idle            2m
+                    timeout     processing      500ms
+                    use-backend coraza
+                    log         global
+
+                spoe-message request
+                    args app=var(txn.coraza.app) src-ip=src src-port=src_port dst-ip=dst dst-port=dst_port method=method path=path query=query version=req.ver headers=req.hdrs body=req.body
+
+                spoe-message response
+                    args app=var(txn.coraza.app) id=var(txn.coraza.id) version=res.ver status=status headers=res.hdrs body=res.body
+                    event on-http-response
+
+                spoe-group request
+                    messages request
+              haproxy-aux.cfg: |
+                backend coraza
+                option spop-check
+                mode tcp
+                server coraza coraza:9000 check
+          
