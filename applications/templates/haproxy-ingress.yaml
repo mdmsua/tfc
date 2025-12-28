@@ -64,7 +64,11 @@ spec:
                 #     - ALL
             extraVolumeMounts:
               - name: haproxy
-                mountPath: /usr/local/etc/haproxy
+                mountPath: /usr/local/etc/haproxy/haproxy-aux.cfg
+                subPath: haproxy.cfg
+              - name: haproxy
+                mountPath: /usr/local/etc/haproxy/coraza.cfg
+                subPath: coraza.cfg
             extraVolumes:
               - name: coraza
                 configMap:
@@ -130,7 +134,7 @@ spec:
 
                 spoe-group request
                     messages request
-              haproxy-aux.cfg: |
+              haproxy.cfg: |
                 backend coraza
                   option spop-check
                   mode tcp
