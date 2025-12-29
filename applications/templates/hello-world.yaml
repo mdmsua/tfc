@@ -88,13 +88,13 @@ spec:
                 - host: hello-world.{{ .Values.domain }}
                   http:
                     paths:
-                      path: /
-                      pathType: Prefix
-                      backend:
-                        service:
-                          name: hello-world
-                          port:
-                            number: 80
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: hello-world
+                            port:
+                              number: 80
               tls:
                 - hosts:
                     - hello-world.{{ .Values.domain }}
