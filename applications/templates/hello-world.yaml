@@ -1,0 +1,102 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello-world
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    name: in-cluster
+    namespace: hello-world
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+      - PruneLast=true
+  sources:
+    - chart: raw
+      repoURL: https://bedag.github.io/helm-charts/
+      targetRevision: 2.0.2
+      helm:
+        valuesObject:
+          resources:
+          - apiVersion: v1
+            kind: Pod
+            metadata:
+              name: hello-world
+              labels:
+                app: hello-world
+            spec:
+              containers:
+              - name: hello-world
+                image: mcr.microsoft.com/mcr/hello-world:v2.0
+                ports:
+                - name: http
+                  containerPort: 80
+          - apiVersion: v1
+            kind: Service
+            metadata:
+              name: hello-world
+            spec:
+              type: ClusterIP
+              ipFamilyPolicy: PreferDualStack
+              ipFamilies:
+                - IPv4
+                - IPv6
+              selector:
+                app: hello-world
+              ports:
+              - protocol: TCP
+                port: 80
+                targetPort: http
+          - apiVersion: v1
+            kind: Ingress
+            metadata:
+              name: hello-world
+              annotations:
+                cert-manager.io/cluster-issuer: letsencrypt
+                haproxy.org/ssl-redirect: "true"
+                haproxy.org/frontend-config-snippet: |
+                  log-format "%ci:%cp\ [%t]\ %ft\ %b/%s\ %Th/%Ti/%TR/%Tq/%Tw/%Tc/%Tr/%Tt\ %ST\ %B\ %CC\ %CS\ %tsc\ %ac/%fc/%bc/%sc/%rc\ %sq/%bq\ %hr\ %hs\ %{+Q}r\ %[var(txn.coraza.id)]\ spoa-error:\ %[var(txn.coraza.error)]\ waf-hit:\ %[var(txn.coraza.status)]\ ruleid:\ %[var(txn.coraza.ruleid)]"
+                  
+                  http-request set-var(txn.coraza.app) str(default)
+
+                  filter spoe engine coraza config /usr/local/etc/haproxy/coraza.cfg
+                  http-request send-spoe-group coraza request
+
+                  http-request redirect code 302 location %[var(txn.coraza.data)] if { var(txn.coraza.action) -m str redirect }
+                  http-response redirect code 302 location %[var(txn.coraza.data)] if { var(txn.coraza.action) -m str redirect }
+
+                  http-request deny deny_status 403 hdr waf-block "request"  if { var(txn.coraza.action) -m str deny }
+                  http-response deny deny_status 403 hdr waf-block "response" if { var(txn.coraza.action) -m str deny }
+
+                  http-request silent-drop if { var(txn.coraza.action) -m str drop }
+                  http-response silent-drop if { var(txn.coraza.action) -m str drop }
+
+                  http-request deny deny_status 500 if { var(txn.coraza.error) -m int gt 0 }
+                  http-response deny deny_status 500 if { var(txn.coraza.error) -m int gt 0 }
+            spec:
+              ingressClassName: haproxy
+              rules:
+                - host: hello-world.{{ .Values.domain }}
+                  http:
+                    paths:
+                      path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: hello-world
+                          port:
+                            number: 80
+              tls:
+                - hosts:
+                    - hello-world.{{ .Values.domain }}
+                  secretName: hello-world-tls
+
