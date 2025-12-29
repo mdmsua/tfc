@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hello-world
+  name: echo
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,7 +9,7 @@ spec:
   project: default
   destination:
     name: in-cluster
-    namespace: hello-world
+    namespace: echo
   syncPolicy:
     automated:
       prune: true
@@ -30,20 +30,20 @@ spec:
           - apiVersion: v1
             kind: Pod
             metadata:
-              name: hello-world
+              name: echo
               labels:
-                app: hello-world
+                app: echo
             spec:
               containers:
-              - name: hello-world
-                image: mcr.microsoft.com/mcr/hello-world:arm64
+              - name: echo
+                image: registry.k8s.io/echoserver:1.10
                 ports:
                 - name: http
                   containerPort: 80
           - apiVersion: v1
             kind: Service
             metadata:
-              name: hello-world
+              name: echo
             spec:
               type: ClusterIP
               ipFamilyPolicy: PreferDualStack
@@ -51,7 +51,7 @@ spec:
                 - IPv4
                 - IPv6
               selector:
-                app: hello-world
+                app: echo
               ports:
               - protocol: TCP
                 port: 80
@@ -59,7 +59,7 @@ spec:
           - apiVersion: networking.k8s.io/v1
             kind: Ingress
             metadata:
-              name: hello-world
+              name: echo
               annotations:
                 cert-manager.io/cluster-issuer: letsencrypt
                 haproxy.org/ssl-redirect: "true"
@@ -85,18 +85,18 @@ spec:
             spec:
               ingressClassName: haproxy
               rules:
-                - host: hello-world.{{ .Values.domain }}
+                - host: echo.{{ .Values.domain }}
                   http:
                     paths:
                       - path: /
                         pathType: Prefix
                         backend:
                           service:
-                            name: hello-world
+                            name: echo
                             port:
                               number: 80
               tls:
                 - hosts:
-                    - hello-world.{{ .Values.domain }}
-                  secretName: hello-world-tls
+                    - echo.{{ .Values.domain }}
+                  secretName: echo-tls
 
