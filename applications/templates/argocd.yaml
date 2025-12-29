@@ -25,6 +25,11 @@ spec:
         valuesObject:
           global:
             domain: argocd.{{ .Values.domain }}
+            dualStack:
+              ipFamilyPolicy: PreferDualStack
+              ipFamilies: 
+                - IPv4
+                - IPv6
           notifications:
             enabled: false
           redis-ha:
