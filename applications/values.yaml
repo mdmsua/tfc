@@ -21,7 +21,7 @@ gatewayApi:
   version: v1.4.0
 
 argocd:
-  version: 9.0.5
+  version: 9.2.3
 
 modsecurity:
   version: 4.21.0
