@@ -36,7 +36,7 @@ spec:
             spec:
               containers:
               - name: hello-world
-                image: mcr.microsoft.com/mcr/hello-world:v2.0
+                image: mcr.microsoft.com/mcr/hello-world:arm64
                 ports:
                 - name: http
                   containerPort: 80
