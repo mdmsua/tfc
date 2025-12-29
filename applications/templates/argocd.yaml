@@ -77,8 +77,6 @@ spec:
                 cert-manager.io/private-key-algorithm: Ed25519
                 haproxy.org/ssl-passthrough: "true"
                 haproxy.org/ssl-redirect: "true"
-                haproxy.org/server-ssl: "true"
-                haproxy.org/server-crt: argocd/argocd-server-tls
                   
                 
           
