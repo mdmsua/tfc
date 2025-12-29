@@ -76,6 +76,7 @@ spec:
                 cert-manager.io/cluster-issuer: letsencrypt
                 haproxy.org/ssl-passthrough: "true"
                 haproxy.org/ssl-redirect: "true"
+                haproxy.org/server-ssl: "true"
                 haproxy.org/server-crt: argocd/argocd-server-tls
                   
                 
