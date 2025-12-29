@@ -96,7 +96,7 @@ spec:
                 http-request set-var(txn.coraza.app) str(default)
 
                 filter spoe engine coraza config /usr/local/etc/haproxy/coraza.cfg
-                http-request send-spoe-group coraza request
+                http-request send-spoe-group coraza coraza-req
 
                 http-request redirect code 302 location %[var(txn.coraza.data)] if { var(txn.coraza.action) -m str redirect }
                 http-response redirect code 302 location %[var(txn.coraza.data)] if { var(txn.coraza.action) -m str redirect }
@@ -139,9 +139,9 @@ spec:
             data:
               coraza.cfg: |
                 [coraza]
-                spoe-agent coraza
-                    #messages   response
-                    groups      request
+                spoe-agent coraza-agent
+                    #messages   coraza-res
+                    groups      coraza-req
                     option      var-prefix      coraza
                     option      set-on-error    error
                     timeout     hello           2s
@@ -150,15 +150,15 @@ spec:
                     use-backend coraza
                     log         global
 
-                spoe-message request
+                spoe-message coraza-req
                     args app=var(txn.coraza.app) src-ip=src src-port=src_port dst-ip=dst dst-port=dst_port method=method path=path query=query version=req.ver headers=req.hdrs body=req.body
 
-                spoe-message response
+                spoe-message coraza-res
                     args app=var(txn.coraza.app) id=var(txn.coraza.id) version=res.ver status=status headers=res.hdrs body=res.body
                     event on-http-response
 
-                spoe-group request
-                    messages request
+                spoe-group coraza-req
+                    messages coraza-req
               haproxy.cfg: |
                 backend coraza
                   option spop-check
