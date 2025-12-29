@@ -70,7 +70,7 @@ spec:
               annotations:
                 cert-manager.io/cluster-issuer: letsencrypt
                 haproxy.org/ssl-passthrough: "true"
-                haproxy.org/ssl-redirect: "false"
+                haproxy.org/ssl-redirect: "true"
                   
                 
           
