@@ -62,6 +62,7 @@ spec:
               name: echo
               annotations:
                 cert-manager.io/cluster-issuer: letsencrypt
+                cert-manager.io/private-key-algorithm: Ed25519
                 haproxy.org/ssl-redirect: "true"
             spec:
               ingressClassName: haproxy

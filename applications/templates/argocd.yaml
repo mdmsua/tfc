@@ -74,6 +74,7 @@ spec:
               ingressClassName: haproxy
               annotations:
                 cert-manager.io/cluster-issuer: letsencrypt
+                cert-manager.io/private-key-algorithm: Ed25519
                 haproxy.org/ssl-passthrough: "true"
                 haproxy.org/ssl-redirect: "true"
                 haproxy.org/server-ssl: "true"
