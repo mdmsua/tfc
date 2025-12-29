@@ -163,5 +163,5 @@ spec:
                 backend coraza
                   option spop-check
                   mode tcp
-                  server coraza 127.0.0.1:9000 check
+                  server coraza coraza:9000 check
           
