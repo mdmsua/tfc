@@ -96,7 +96,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   default_node_pool {
-    name                         = "system"
+    name                         = "default"
     temporary_name_for_rotation  = "temp"
     only_critical_addons_enabled = true
     host_encryption_enabled      = true
@@ -134,7 +134,21 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   auto_scaler_profile {
-    balance_similar_node_groups = true
+    balance_similar_node_groups                   = true
+    scan_interval                                 = "1m"
+    scale_down_delay_after_add                    = "0m"
+    scale_down_delay_after_failure                = "1m"
+    scale_down_delay_after_delete                 = "1m"
+    scale_down_unneeded                           = "3m"
+    scale_down_unready                            = "3m"
+    max_graceful_termination_sec                  = 30
+    skip_nodes_with_local_storage                 = false
+    empty_bulk_delete_max                         = 30
+    max_unready_percentage                        = 100
+    max_node_provisioning_time                    = "30m"
+    daemonset_eviction_for_empty_nodes_enabled    = true
+    daemonset_eviction_for_occupied_nodes_enabled = true
+    ignore_daemonsets_utilization_enabled         = true
   }
 
   api_server_access_profile {
@@ -176,6 +190,29 @@ resource "azurerm_kubernetes_cluster" "main" {
   depends_on = [
     azurerm_role_assignment.cluster_disk_encryption_set_reader,
   ]
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "main" {
+  name                        = "workload"
+  kubernetes_cluster_id       = azurerm_kubernetes_cluster.main.id
+  temporary_name_for_rotation = "tmp"
+  mode                        = "User"
+  host_encryption_enabled     = true
+  auto_scaling_enabled        = true
+  min_count                   = 0
+  max_count                   = 3
+  max_pods                    = 64
+  os_disk_size_gb             = 100
+  os_sku                      = "AzureLinux"
+  os_disk_type                = "Ephemeral"
+  vm_size                     = "Standard_D2pds_v6"
+  vnet_subnet_id              = azurerm_subnet.nodes.id
+  orchestrator_version        = var.kubernetes_version
+  zones                       = ["1", "2", "3"]
+
+  upgrade_settings {
+    max_surge = "100%"
+  }
 }
 
 resource "azurerm_role_assignment" "cluster_admins" {
