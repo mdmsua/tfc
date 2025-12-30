@@ -85,7 +85,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 
     load_balancer_profile {
       idle_timeout_in_minutes  = 4
-      outbound_ports_allocated = 8192
+      outbound_ports_allocated = 4096
       backend_pool_type        = "NodeIP"
 
       outbound_ip_address_ids = [
@@ -100,7 +100,9 @@ resource "azurerm_kubernetes_cluster" "main" {
     temporary_name_for_rotation  = "temp"
     only_critical_addons_enabled = true
     host_encryption_enabled      = true
-    node_count                   = 1
+    auto_scaling_enabled         = true
+    min_count                    = 1
+    max_count                    = 3
     max_pods                     = 64
     os_disk_size_gb              = 32
     os_sku                       = "AzureLinux"
@@ -182,7 +184,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   mode                        = "User"
   host_encryption_enabled     = true
   auto_scaling_enabled        = true
-  min_count                   = 0
+  min_count                   = 1
   max_count                   = 3
   max_pods                    = 64
   os_disk_size_gb             = 32
