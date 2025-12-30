@@ -244,6 +244,7 @@ resource "azurerm_role_assignment" "kubelet_container_registry_repository_reader
  OR 
  (
   @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'modsecurity'
+  ${templatefile("${path.module}/files/template.tfpl", { mirrors = split(",", var.container_registry_mirrors) })}
  )
 )
 EOF

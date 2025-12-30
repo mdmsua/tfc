@@ -84,3 +84,8 @@ variable "github_owner" {
   description = "GitHub owner"
   type        = string
 }
+
+variable "container_registry_mirrors" {
+  description = "Comma-separated list of container registry mirrors"
+  type        = string
+}
