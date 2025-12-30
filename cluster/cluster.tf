@@ -112,7 +112,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     zones                        = ["1", "2", "3"]
 
     upgrade_settings {
-      max_surge = "100%"
+      max_surge = "1"
     }
   }
 
@@ -195,7 +195,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   zones                       = ["1", "2", "3"]
 
   upgrade_settings {
-    max_surge = "100%"
+    max_surge = "1"
   }
 }
 
