@@ -10,7 +10,7 @@ cloudflare:
   apiTokenKey: api-token
 
 certManager:
-  version: v1.19.1
+  version: v1.19.2
   email: acme@dmmo.io
   server: https://acme-v02.api.letsencrypt.org/directory
 
