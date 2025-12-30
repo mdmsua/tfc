@@ -219,8 +219,11 @@ locals {
     REGISTRY        = azurerm_container_registry.main.login_server
   }
   tfe_variables = {
-    container_registry_id     = azurerm_container_registry.main.id
-    container_registry_server = azurerm_container_registry.main.login_server
+    container_registry_id      = azurerm_container_registry.main.id
+    container_registry_server  = azurerm_container_registry.main.login_server
+    container_registry_mirrors = keys(local.mirrors)
+    key_vault_id               = azurerm_key_vault.main.id
+    key_vault_uri              = azurerm_key_vault.main.vault_uri
   }
 }
 
@@ -243,4 +246,5 @@ resource "tfe_variable" "azure" {
   key             = each.key
   value           = each.value
   variable_set_id = data.tfe_variable_set.azure.id
+  hcl             = can(distinct(each.value))
 }
