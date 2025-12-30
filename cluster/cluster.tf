@@ -175,3 +175,24 @@ resource "azapi_update_resource" "preview_features" {
     update = "1h"
   }
 }
+
+resource "azurerm_role_assignment" "kubelet_container_registry_repository_reader" {
+  scope                = var.container_registry_id
+  role_definition_name = "Container Registry Repository Reader"
+  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
+  principal_type       = "ServicePrincipal"
+  condition_version    = "2.0"
+  condition            = <<EOF
+  (
+ (
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/content/read'})
+  AND
+  !(ActionMatches{'Microsoft.ContainerRegistry/registries/repositories/metadata/read'})
+ )
+ OR 
+ (
+  @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'modsecurity'
+ )
+)
+EOF
+}

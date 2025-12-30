@@ -13,16 +13,15 @@ data "tfe_project" "main" {
 
 data "tfe_organization" "main" {}
 
-data "tfe_oauth_client" "main" {
-  oauth_client_id = "ot-LtULrZJ8rQraLxoj"
-}
-
 data "azurerm_client_config" "main" {}
 
-
 resource "tfe_variable_set" "main" {
-  name              = "Azure"
-  parent_project_id = data.tfe_project.main.id
+  name = "Azure"
+}
+
+resource "tfe_project_variable_set" "main" {
+  project_id      = data.tfe_project.main.id
+  variable_set_id = tfe_variable_set.main.id
 }
 
 resource "tfe_workspace" "main" {
@@ -35,17 +34,17 @@ resource "tfe_workspace" "main" {
   working_directory              = lookup(each.value, "directory", each.key)
   terraform_version              = "~> 1.14.0"
   auto_apply                     = true
+  trigger_patterns               = [lookup(each.value, "directory", each.key)]
 
   vcs_repo {
-    identifier     = "mdmsua/tfc"
-    branch         = "main"
-    oauth_token_id = data.tfe_oauth_client.main.oauth_token_id
+    identifier                 = "mdmsua/tfc"
+    github_app_installation_id = "ghain-h96Ax4WhkEsc8N96"
   }
 }
 
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.2"
+  version = "0.4.3"
   suffix  = ["tfc", "gwc"]
 }
 

@@ -25,6 +25,11 @@ spec:
         valuesObject:
           global:
             domain: argocd.{{ .Values.domain }}
+            dualStack:
+              ipFamilyPolicy: PreferDualStack
+              ipFamilies: 
+                - IPv4
+                - IPv6
           notifications:
             enabled: false
           redis-ha:
@@ -68,8 +73,10 @@ spec:
               tls: true
               ingressClassName: haproxy
               annotations:
-                haproxy.org/ssl-passthrough: "true"
-                haproxy.org/ssl-redirect: "false"
                 cert-manager.io/cluster-issuer: letsencrypt
+                cert-manager.io/private-key-size: "4096"
+                haproxy.org/ssl-passthrough: "true"
+                haproxy.org/ssl-redirect: "true"
+                  
                 
           
