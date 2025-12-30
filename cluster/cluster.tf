@@ -106,7 +106,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     max_pods                     = 64
     os_disk_size_gb              = 32
     os_sku                       = "AzureLinux"
-    vm_size                      = "Standard_B2ps_v2"
+    vm_size                      = "Standard_B2pls_v2"
     vnet_subnet_id               = azurerm_subnet.nodes.id
     orchestrator_version         = var.kubernetes_version
     zones                        = ["1", "2", "3"]
@@ -184,7 +184,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   mode                        = "User"
   host_encryption_enabled     = true
   auto_scaling_enabled        = true
-  min_count                   = 1
+  min_count                   = 0
   max_count                   = 3
   max_pods                    = 64
   os_disk_size_gb             = 32
