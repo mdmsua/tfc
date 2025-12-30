@@ -155,6 +155,7 @@ locals {
     REGISTRY        = azurerm_container_registry.main.login_server
   }
   tfe_variables = {
+    container_registry_id     = azurerm_container_registry.main.id
     container_registry_server = azurerm_container_registry.main.login_server
   }
 }

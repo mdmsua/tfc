@@ -26,6 +26,7 @@ spec:
         - values.yaml
       valuesObject:
         domain: ${domain}
+        registry: ${registry}
         externalSecrets:
           clientId: ${external_secrets_client_id}
           vaultUrl: ${key_vault_url}
