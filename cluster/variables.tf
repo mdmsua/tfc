@@ -15,7 +15,7 @@ variable "tfc_azure_dynamic_credentials" {
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.33"
+  default     = "1.34"
 }
 
 variable "admins" {

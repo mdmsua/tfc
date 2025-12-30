@@ -47,6 +47,10 @@ resource "azurerm_role_assignment" "cluster_disk_encryption_set_reader" {
   scope                = azurerm_disk_encryption_set.main.id
 }
 
+locals {
+  maintenance_days = toset(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+}
+
 resource "azurerm_kubernetes_cluster" "main" {
   name                              = module.naming.kubernetes_cluster.name
   location                          = azurerm_resource_group.main.location
@@ -56,7 +60,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   disk_encryption_set_id            = azurerm_disk_encryption_set.main.id
   kubernetes_version                = var.kubernetes_version
   sku_tier                          = "Standard"
-  automatic_upgrade_channel         = "node-image"
+  automatic_upgrade_channel         = "patch"
   node_os_upgrade_channel           = "NodeImage"
   local_account_disabled            = true
   oidc_issuer_enabled               = true
@@ -133,6 +137,28 @@ resource "azurerm_kubernetes_cluster" "main" {
   api_server_access_profile {
     virtual_network_integration_enabled = true
     subnet_id                           = azurerm_subnet.api_server.id
+  }
+
+  maintenance_window {
+    dynamic "allowed" {
+      for_each = local.maintenance_days
+      content {
+        day   = allowed.value
+        hours = range(0, 24)
+      }
+    }
+  }
+
+  maintenance_window_auto_upgrade {
+    frequency = "Daily"
+    interval  = 1
+    duration  = 24
+  }
+
+  maintenance_window_node_os {
+    frequency = "Daily"
+    interval  = 1
+    duration  = 24
   }
 
   lifecycle {
