@@ -106,8 +106,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     max_pods                     = 64
     os_disk_size_gb              = 100
     os_sku                       = "AzureLinux"
-    os_disk_type                 = "Ephemeral"
-    vm_size                      = "Standard_D2pds_v6"
+    vm_size                      = "Standard_B2pls_v2"
     vnet_subnet_id               = azurerm_subnet.nodes.id
     orchestrator_version         = var.kubernetes_version
     zones                        = ["1", "2", "3"]
@@ -134,21 +133,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   auto_scaler_profile {
-    balance_similar_node_groups                   = true
-    scan_interval                                 = "1m"
-    scale_down_delay_after_add                    = "0m"
-    scale_down_delay_after_failure                = "1m"
-    scale_down_delay_after_delete                 = "1m"
-    scale_down_unneeded                           = "3m"
-    scale_down_unready                            = "3m"
-    max_graceful_termination_sec                  = 30
-    skip_nodes_with_local_storage                 = false
-    empty_bulk_delete_max                         = 30
-    max_unready_percentage                        = 100
-    max_node_provisioning_time                    = "30m"
-    daemonset_eviction_for_empty_nodes_enabled    = true
-    daemonset_eviction_for_occupied_nodes_enabled = true
-    ignore_daemonsets_utilization_enabled         = true
+    balance_similar_node_groups = true
   }
 
   api_server_access_profile {
@@ -204,8 +189,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   max_pods                    = 64
   os_disk_size_gb             = 100
   os_sku                      = "AzureLinux"
-  os_disk_type                = "Ephemeral"
-  vm_size                     = "Standard_D2pds_v6"
+  vm_size                     = "Standard_B2pls_v2"
   vnet_subnet_id              = azurerm_subnet.nodes.id
   orchestrator_version        = var.kubernetes_version
   zones                       = ["1", "2", "3"]
