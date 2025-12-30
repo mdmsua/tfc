@@ -37,6 +37,17 @@ resource "azurerm_container_registry_cache_rule" "main" {
   target_repo           = each.key
 }
 
+resource "azurerm_key_vault" "main" {
+  name                       = "mdmsua"
+  location                   = azurerm_resource_group.main.location
+  resource_group_name        = azurerm_resource_group.main.name
+  tenant_id                  = data.azurerm_client_config.main.tenant_id
+  sku_name                   = "standard"
+  rbac_authorization_enabled = true
+  purge_protection_enabled   = true
+  soft_delete_retention_days = 7
+}
+
 resource "azurerm_user_assigned_identity" "push" {
   name                = "${module.naming.user_assigned_identity.name}-push"
   resource_group_name = azurerm_resource_group.main.name
