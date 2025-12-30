@@ -48,6 +48,20 @@ resource "azurerm_key_vault" "main" {
   soft_delete_retention_days = 7
 }
 
+resource "azurerm_role_assignment" "key_vault_administrator" {
+  for_each = var.contributors
+
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = each.key
+  scope                = azurerm_key_vault.main.id
+}
+
+resource "azurerm_role_assignment" "this_key_vault_administrator" {
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = data.azurerm_client_config.main.object_id
+  scope                = azurerm_key_vault.main.id
+}
+
 resource "azurerm_user_assigned_identity" "push" {
   name                = "${module.naming.user_assigned_identity.name}-push"
   resource_group_name = azurerm_resource_group.main.name
