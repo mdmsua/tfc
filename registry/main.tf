@@ -9,6 +9,16 @@ module "naming" {
   suffix  = ["tfc", "gwc"]
 }
 
+locals {
+  mirrors = {
+    #docker.io         = true
+    "mcr.microsoft.com" = false
+    "quay.io"           = false
+    "ghcr.io"           = false
+    "public.ecr.aws"    = false
+    "gcr.io"            = false
+  }
+}
 
 resource "azurerm_container_registry" "main" {
   name                   = azurerm_resource_group.main.name
@@ -17,6 +27,14 @@ resource "azurerm_container_registry" "main" {
   admin_enabled          = false
   anonymous_pull_enabled = false
   sku                    = "Basic"
+}
+
+resource "azurerm_container_registry_cache_rule" "main" {
+  for_each              = local.mirrors
+  container_registry_id = azurerm_container_registry.main.id
+  name                  = replace(each.key, ".", "-")
+  source_repo           = each.key
+  target_repo           = each.key
 }
 
 resource "azurerm_user_assigned_identity" "push" {
