@@ -100,9 +100,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     temporary_name_for_rotation  = "temp"
     only_critical_addons_enabled = true
     host_encryption_enabled      = true
-    auto_scaling_enabled         = true
-    min_count                    = 1
-    max_count                    = 3
+    node_count                   = 1
     max_pods                     = 64
     os_disk_size_gb              = 32
     os_sku                       = "AzureLinux"
