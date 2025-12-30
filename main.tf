@@ -34,7 +34,7 @@ resource "tfe_workspace" "main" {
   working_directory              = lookup(each.value, "directory", each.key)
   terraform_version              = "~> 1.14.0"
   auto_apply                     = true
-  trigger_patterns               = [lookup(each.value, "directory", each.key)]
+  trigger_patterns               = ["${lookup(each.value, "directory", each.key)}/**/*"]
 
   vcs_repo {
     identifier                 = "mdmsua/tfc"
