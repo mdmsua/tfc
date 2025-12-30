@@ -221,7 +221,7 @@ locals {
   tfe_variables = {
     container_registry_id      = azurerm_container_registry.main.id
     container_registry_server  = azurerm_container_registry.main.login_server
-    container_registry_mirrors = keys(local.mirrors)
+    container_registry_mirrors = join(",", keys(local.mirrors))
     key_vault_id               = azurerm_key_vault.main.id
     key_vault_uri              = azurerm_key_vault.main.vault_uri
   }
@@ -244,7 +244,6 @@ resource "tfe_variable" "azure" {
 
   category        = "terraform"
   key             = each.key
-  value           = tostring(each.value)
+  value           = each.value
   variable_set_id = data.tfe_variable_set.azure.id
-  hcl             = can(distinct(each.value))
 }
