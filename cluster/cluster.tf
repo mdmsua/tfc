@@ -59,7 +59,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   dns_prefix                        = "dmmo"
   disk_encryption_set_id            = azurerm_disk_encryption_set.main.id
   kubernetes_version                = var.kubernetes_version
-  sku_tier                          = "Standard"
+  sku_tier                          = "Free"
   automatic_upgrade_channel         = "patch"
   node_os_upgrade_channel           = "NodeImage"
   local_account_disabled            = true
@@ -96,18 +96,21 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   default_node_pool {
-    name                        = "default"
-    temporary_name_for_rotation = "temp"
-    host_encryption_enabled     = true
-    auto_scaling_enabled        = true
-    min_count                   = 1
-    max_count                   = 3
-    max_pods                    = 64
-    os_disk_size_gb             = 32
-    os_sku                      = "AzureLinux"
-    vm_size                     = "Standard_B2ps_v2"
-    vnet_subnet_id              = azurerm_subnet.nodes.id
-    orchestrator_version        = var.kubernetes_version
+    name                         = "system"
+    temporary_name_for_rotation  = "temp"
+    only_critical_addons_enabled = true
+    host_encryption_enabled      = true
+    auto_scaling_enabled         = true
+    min_count                    = 1
+    max_count                    = 3
+    max_pods                     = 64
+    os_disk_size_gb              = 100
+    os_sku                       = "AzureLinux"
+    os_disk_type                 = "Ephemeral"
+    vm_size                      = "Standard_D2pds_v6"
+    vnet_subnet_id               = azurerm_subnet.nodes.id
+    orchestrator_version         = var.kubernetes_version
+    zones                        = ["1", "2", "3"]
 
     upgrade_settings {
       max_surge = "100%"
@@ -150,15 +153,17 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   maintenance_window_auto_upgrade {
-    frequency = "Daily"
-    interval  = 1
-    duration  = 24
+    frequency  = "Daily"
+    interval   = 1
+    duration   = 24
+    start_time = "00:00"
   }
 
   maintenance_window_node_os {
-    frequency = "Daily"
-    interval  = 1
-    duration  = 24
+    frequency  = "Daily"
+    interval   = 1
+    duration   = 24
+    start_time = "00:00"
   }
 
   lifecycle {
