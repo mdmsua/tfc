@@ -11,12 +11,18 @@ module "naming" {
 
 locals {
   mirrors = {
-    #docker.io         = true
+    "docker.io"         = true
     "mcr.microsoft.com" = false
     "quay.io"           = false
     "ghcr.io"           = false
     "public.ecr.aws"    = false
     "gcr.io"            = false
+  }
+  credentials = {
+    "docker.io" = {
+      username = var.github_owner
+      password = var.docker_hub_token
+    }
   }
 }
 
@@ -30,11 +36,13 @@ resource "azurerm_container_registry" "main" {
 }
 
 resource "azurerm_container_registry_cache_rule" "main" {
-  for_each              = local.mirrors
+  for_each = local.mirrors
+
   container_registry_id = azurerm_container_registry.main.id
   name                  = replace(each.key, ".", "-")
   source_repo           = each.key
   target_repo           = each.key
+  credential_set_id     = contains(keys(local.credentials), each.key) ? module.credentials[each.key].id : null
 }
 
 resource "azurerm_key_vault" "main" {
@@ -60,6 +68,19 @@ resource "azurerm_role_assignment" "this_key_vault_administrator" {
   role_definition_name = "Key Vault Administrator"
   principal_id         = data.azurerm_client_config.main.object_id
   scope                = azurerm_key_vault.main.id
+}
+
+module "credentials" {
+  for_each = local.credentials
+  source   = "./modules/credential"
+
+  container_registry_id = azurerm_container_registry.main.id
+  key_vault_id          = azurerm_key_vault.main.id
+  server                = each.key
+  username              = each.value.username
+  password              = each.value.password
+
+  depends_on = [azurerm_role_assignment.this_key_vault_administrator]
 }
 
 resource "azurerm_user_assigned_identity" "push" {
