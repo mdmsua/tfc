@@ -244,7 +244,7 @@ resource "tfe_variable" "azure" {
 
   category        = "terraform"
   key             = each.key
-  value           = each.value
+  value           = tostring(each.value)
   variable_set_id = data.tfe_variable_set.azure.id
   hcl             = can(distinct(each.value))
 }
