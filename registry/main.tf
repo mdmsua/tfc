@@ -40,8 +40,8 @@ resource "azurerm_container_registry_cache_rule" "main" {
 
   container_registry_id = azurerm_container_registry.main.id
   name                  = replace(each.key, ".", "-")
-  source_repo           = each.key
-  target_repo           = each.key
+  source_repo           = "${each.key}/*"
+  target_repo           = "${each.key}/*"
   credential_set_id     = contains(keys(local.credentials), each.key) ? module.credentials[each.key].id : null
 }
 
