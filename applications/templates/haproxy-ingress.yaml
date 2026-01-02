@@ -28,6 +28,8 @@ spec:
         valuesObject:
           controller:
             kind: DaemonSet
+            image:
+              repository: {{ .Values.registry }}/docker.io/haproxytech/kubernetes-ingress
             config:
               syslog-server: "address:stdout, format: raw, facility:daemon"
               frontend-config-snippet: |

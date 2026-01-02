@@ -24,6 +24,8 @@ spec:
       targetRevision: {{ .Values.certManager.version }}
       helm:
         valuesObject:
+          image: 
+            repository: {{ .Values.registry }}/quay.io/jetstack/cert-manager-controller
           crds:
             enabled: true
     - chart: raw

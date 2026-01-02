@@ -3,7 +3,7 @@ externalSecrets:
   secretStoreName: azure
 
 externalDns:
-  version: 1.19.0
+  version: 1.20.0
 
 cloudflare:
   secretName: cloudflare
