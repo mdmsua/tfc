@@ -11,8 +11,15 @@ resource "azurerm_key_vault" "main" {
   soft_delete_retention_days    = 7
 }
 
-resource "azurerm_role_assignment" "key_vault_administrator" {
-  role_definition_name = "Key Vault Administrator"
+resource "azurerm_role_assignment" "key_vault_secrets_officer" {
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.main.object_id
+  scope                = var.key_vault_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "key_vault_crypto_officer" {
+  role_definition_name = "Key Vault Crypto Officer"
   principal_id         = data.azurerm_client_config.main.object_id
   scope                = azurerm_key_vault.main.id
   principal_type       = "ServicePrincipal"
@@ -30,7 +37,7 @@ resource "azurerm_key_vault_key" "cluster" {
   ]
 
   depends_on = [
-    azurerm_role_assignment.key_vault_administrator,
+    azurerm_role_assignment.key_vault_crypto_officer,
   ]
 }
 
@@ -40,7 +47,7 @@ resource "azurerm_key_vault_secret" "cloudflare_api_token" {
   value        = var.cloudflare_api_token
 
   depends_on = [
-    azurerm_role_assignment.key_vault_administrator
+    azurerm_role_assignment.key_vault_secrets_officer
   ]
 }
 
@@ -50,6 +57,6 @@ resource "azurerm_key_vault_secret" "docker_hub_auth" {
   value        = base64encode("${var.docker_hub_username}:${var.docker_hub_token}")
 
   depends_on = [
-    azurerm_role_assignment.key_vault_administrator
+    azurerm_role_assignment.key_vault_secrets_officer
   ]
 }
