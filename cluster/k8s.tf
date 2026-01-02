@@ -101,7 +101,7 @@ resource "azurerm_federated_identity_credential" "external_secrets" {
 }
 
 resource "azurerm_role_assignment" "external_secrets" {
-  scope                = azurerm_key_vault.main.id
+  scope                = var.key_vault_id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_user_assigned_identity.external_secrets.principal_id
 }
