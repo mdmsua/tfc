@@ -1,0 +1,95 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: github
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    name: in-cluster
+    namespace: github-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+    - CreateNamespace=true
+    - PruneLast=true
+  sources:
+    - repoURL: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+      chart: gha-runner-scale-set-controller
+      targetRevision: 0.13.1
+      helm:
+        releaseName: github
+        valuesObject:
+          image:
+            repository: {{ .Values.registry }}/ghcr.io/actions/gha-runner-scale-set-controller
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          flags:
+            watchSingleNamespace: github-runners
+    - chart: raw
+      repoURL: https://bedag.github.io/helm-charts/
+      targetRevision: 2.0.2
+      helm:
+        valuesObject:
+          resources:
+            - apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: github-runners
+            - apiVersion: external-secrets.io/v1
+              kind: ExternalSecret
+              metadata:
+                name: github
+              spec:
+                secretStoreRef:
+                  name: {{ .Values.externalSecrets.secretStoreName }}
+                  kind: ClusterSecretStore
+                data:
+                  - secretKey: github_app_id
+                    remoteRef:
+                      key: github-app-id
+                      conversionStrategy: Default	
+                      decodingStrategy: None
+                      metadataPolicy: None
+                  - secretKey: github_app_installation_id
+                    remoteRef:
+                      key: github-app-installation-id
+                      conversionStrategy: Default	
+                      decodingStrategy: None
+                      metadataPolicy: None
+                  - secretKey: github_app_private_key
+                    remoteRef:
+                      key: github-app-pem-file
+                      conversionStrategy: Default	
+                      decodingStrategy: None
+                      metadataPolicy: None
+                refreshPolicy: Periodic
+                refreshInterval: 5m
+    - repoURL: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+      chart: gha-runner-scale-set
+      targetRevision: 0.13.1
+      helm:
+        releaseName: github
+        valuesObject:
+          githubConfigUrl: https://github.com/mdmsua/tfc
+          githubConfigSecret: arc
+          runnerScaleSetName: k8s
+          controllerServiceAccount:
+           namespace: github-system
+           name: github-gha-rs-controller
+          template:
+            spec:
+              containers:
+                - name: runner
+                  image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
+                  command: ["/home/runner/run.sh"]

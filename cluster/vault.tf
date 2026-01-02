@@ -36,7 +36,7 @@ resource "azurerm_key_vault_key" "cluster" {
 
 resource "azurerm_key_vault_secret" "cloudflare_api_token" {
   name         = "cloudflare-api-token"
-  key_vault_id = azurerm_key_vault.main.id
+  key_vault_id = var.key_vault_id
   value        = var.cloudflare_api_token
 
   depends_on = [
@@ -46,7 +46,7 @@ resource "azurerm_key_vault_secret" "cloudflare_api_token" {
 
 resource "azurerm_key_vault_secret" "docker_hub_auth" {
   name         = "docker-hub-auth"
-  key_vault_id = azurerm_key_vault.main.id
+  key_vault_id = var.key_vault_id
   value        = base64encode("${var.docker_hub_username}:${var.docker_hub_token}")
 
   depends_on = [

@@ -89,3 +89,13 @@ variable "container_registry_mirrors" {
   description = "Comma-separated list of container registry mirrors"
   type        = string
 }
+
+variable "key_vault_id" {
+  description = "Key vault ID"
+  type        = string
+}
+
+variable "key_vault_uri" {
+  description = "Key vault URI"
+  type        = string
+}

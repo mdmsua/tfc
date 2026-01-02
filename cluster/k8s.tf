@@ -152,7 +152,7 @@ resource "kubernetes_secret_v1" "repository" {
 resource "kubectl_manifest" "seed" {
   yaml_body = templatefile("${path.module}/files/seed.yaml", {
     external_secrets_client_id = azurerm_user_assigned_identity.external_secrets.client_id
-    key_vault_url              = azurerm_key_vault.main.vault_uri
+    key_vault_url              = var.key_vault_uri
     cloudflare_remote_key      = azurerm_key_vault_secret.cloudflare_api_token.name
     domain                     = var.domain
     registry                   = var.container_registry_server
