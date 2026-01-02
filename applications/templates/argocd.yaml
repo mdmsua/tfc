@@ -25,7 +25,8 @@ spec:
         valuesObject:
           global:
             domain: argocd.{{ .Values.domain }}
-            repository: {{ .Values.registry }}/quay.io/argoproj/argocd
+            image:
+              repository: {{ .Values.registry }}/quay.io/argoproj/argocd
             dualStack:
               ipFamilyPolicy: PreferDualStack
               ipFamilies: 
