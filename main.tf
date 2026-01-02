@@ -5,6 +5,8 @@ locals {
     "Microsoft.ContainerService" = ["EnableAPIServerVnetIntegrationPreview", "AzureOverlayDualStackPreview", "IMDSRestrictionPreview"]
     "Microsoft.Compute"          = ["EncryptionAtHost"]
   }
+
+  run_phases = toset(["plan", "apply"])
 }
 
 data "tfe_project" "main" {
@@ -50,7 +52,7 @@ module "naming" {
 
 resource "azurerm_resource_group" "main" {
   name     = module.naming.resource_group.name
-  location = "germanywestcentral"
+  location = var.location
 }
 
 resource "azurerm_user_assigned_identity" "main" {
@@ -60,24 +62,19 @@ resource "azurerm_user_assigned_identity" "main" {
   location            = azurerm_resource_group.main.location
 }
 
-resource "azurerm_federated_identity_credential" "plan" {
-  for_each            = local.workspaces
-  name                = "${each.key}-plan"
-  resource_group_name = azurerm_user_assigned_identity.main[each.key].resource_group_name
-  parent_id           = azurerm_user_assigned_identity.main[each.key].id
+resource "azurerm_federated_identity_credential" "main" {
+  for_each = { for pair in setproduct(keys(local.workspaces), tolist(local.run_phases)) :
+    "${pair[0]}-${pair[1]}" => {
+      workspace = pair[0]
+      phase     = pair[1]
+    }
+  }
+  name                = each.key
+  resource_group_name = azurerm_user_assigned_identity.main[each.value.workspace].resource_group_name
+  parent_id           = azurerm_user_assigned_identity.main[each.value.workspace].id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = "https://app.terraform.io"
-  subject             = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:plan"
-}
-
-resource "azurerm_federated_identity_credential" "apply" {
-  for_each            = local.workspaces
-  name                = "${each.key}-apply"
-  resource_group_name = azurerm_user_assigned_identity.main[each.key].resource_group_name
-  parent_id           = azurerm_user_assigned_identity.main[each.key].id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = "https://app.terraform.io"
-  subject             = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:apply"
+  subject             = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.value.workspace}:run_phase:${each.value.phase}"
 }
 
 resource "azurerm_role_assignment" "main" {
@@ -117,19 +114,17 @@ resource "tfe_workspace_settings" "main" {
   execution_mode = "agent"
 }
 
-resource "tfe_variable" "arm_client_id" {
-  for_each     = local.workspaces
-  key          = "ARM_CLIENT_ID"
-  value        = azurerm_user_assigned_identity.main[each.key].client_id
-  workspace_id = tfe_workspace.main[each.key].id
-  category     = "env"
-}
-
-resource "tfe_variable" "tfc_azure_run_client_id" {
-  for_each     = local.workspaces
-  key          = "TFC_AZURE_RUN_CLIENT_ID"
-  value        = azurerm_user_assigned_identity.main[each.key].client_id
-  workspace_id = tfe_workspace.main[each.key].id
+resource "tfe_variable" "main" {
+  for_each = {
+    for pair in setproduct(keys(local.workspaces), ["ARM_CLIENT_ID", "TFC_AZURE_RUN_CLIENT_ID"]) :
+    "${pair[0]}-${pair[1]}" => {
+      workspace_key = pair[0]
+      variable_key  = pair[1]
+    }
+  }
+  key          = each.value.variable_key
+  value        = azurerm_user_assigned_identity.main[each.value.workspace_key].client_id
+  workspace_id = tfe_workspace.main[each.value.workspace_key].id
   category     = "env"
 }
 
