@@ -94,8 +94,8 @@ spec:
           template:
             spec:
               securityContext:
-                fsGroup: 123
-                runAsUser: 1001
+                runAsUser: 0
+                runAsGroup: 0
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
