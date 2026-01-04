@@ -81,8 +81,9 @@ spec:
       helm:
         releaseName: github
         valuesObject:
+          namespaceOverride: github-runners        
           githubConfigUrl: {{ .Values.github.repository }}
-          githubConfigSecret: arc
+          githubConfigSecret: github
           runnerScaleSetName: k8s
           controllerServiceAccount:
            namespace: github-system
