@@ -97,3 +97,9 @@ spec:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                   command: ["/home/runner/run.sh"]
+                  env:
+                    - name: ACTIONS_RUNNER_IMAGE
+                      value: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
+              volumes:
+                - name: temp
+                  emptyDir: {}
