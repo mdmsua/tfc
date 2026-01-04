@@ -166,7 +166,7 @@ resource "kubectl_manifest" "seed" {
     storage_resource_group                = azurerm_storage_account.main.resource_group_name
     storage_account_name                  = azurerm_storage_account.main.name
     storage_share_name                    = azurerm_storage_share.main.name
-    storage_folder_name                   = azurerm_storage_share_directory.github.name
+    storage_folder_name                   = azurerm_storage_share_directory.main.name
     storage_server                        = azurerm_storage_account.main.primary_file_host
   })
 

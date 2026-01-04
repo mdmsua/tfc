@@ -11,7 +11,7 @@ resource "azurerm_role_assignment" "storage_key_vault_crypto_service_encryption_
 }
 
 resource "azurerm_storage_account" "main" {
-  name                              = module.naming.storage_account.name
+  name                              = trimprefix(module.naming.storage_account.name, module.naming.storage_account.slug)
   resource_group_name               = azurerm_resource_group.main.name
   location                          = azurerm_resource_group.main.location
   account_tier                      = "Premium"
@@ -22,6 +22,7 @@ resource "azurerm_storage_account" "main" {
   allow_nested_items_to_be_public   = false
   local_user_enabled                = false
   provisioned_billing_model_version = "V2"
+  infrastructure_encryption_enabled = true
 
   identity {
     type         = "UserAssigned"
@@ -44,13 +45,13 @@ resource "azurerm_storage_account" "main" {
 }
 
 resource "azurerm_storage_share" "main" {
-  name               = "default"
+  name               = module.naming.storage_share.name
   enabled_protocol   = "NFS"
   quota              = 100
   storage_account_id = azurerm_storage_account.main.id
 }
 
-resource "azurerm_storage_share_directory" "github" {
-  name             = "github"
+resource "azurerm_storage_share_directory" "main" {
+  name             = module.naming.storage_share_directory.name
   storage_share_id = azurerm_storage_share.main.url
 }
