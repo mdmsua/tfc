@@ -9,6 +9,12 @@ resource "azurerm_key_vault" "main" {
   enabled_for_disk_encryption   = true
   purge_protection_enabled      = true
   soft_delete_retention_days    = 7
+
+  network_acls {
+    default_action             = "Deny"
+    bypass                     = "AzureServices"
+    virtual_network_subnet_ids = [data.tfe_outputs.agent.values.subnet_id]
+  }
 }
 
 resource "azurerm_role_assignment" "key_vault_secrets_officer" {
@@ -27,6 +33,22 @@ resource "azurerm_role_assignment" "key_vault_crypto_officer" {
 
 resource "azurerm_key_vault_key" "cluster" {
   name         = "cluster"
+  key_vault_id = azurerm_key_vault.main.id
+  key_type     = "RSA"
+  key_size     = 4096
+
+  key_opts = [
+    "unwrapKey",
+    "wrapKey",
+  ]
+
+  depends_on = [
+    azurerm_role_assignment.key_vault_crypto_officer,
+  ]
+}
+
+resource "azurerm_key_vault_key" "storage" {
+  name         = "storage"
   key_vault_id = azurerm_key_vault.main.id
   key_type     = "RSA"
   key_size     = 4096

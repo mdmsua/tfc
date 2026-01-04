@@ -163,6 +163,11 @@ resource "kubectl_manifest" "seed" {
     oidc_tenant_id                        = data.azurerm_client_config.main.tenant_id
     oidc_client_id                        = azuread_application.argocd.client_id
     oidc_group_id                         = azuread_group.argocd_admins.object_id
+    storage_resource_group                = azurerm_storage_account.main.resource_group_name
+    storage_account_name                  = azurerm_storage_account.main.name
+    storage_share_name                    = azurerm_storage_share.main.name
+    storage_folder_name                   = azurerm_storage_share_directory.github.name
+    storage_server                        = azurerm_storage_account.main.primary_file_host
   })
 
   depends_on = [helm_release.argocd]

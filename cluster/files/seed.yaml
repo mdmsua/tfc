@@ -41,3 +41,9 @@ spec:
           appIdRemoteKey: ${github_app_id_remote_key}
           appInstallationIdRemoteKey: ${github_app_installation_id_remote_key}
           appPemFileRemoteKey: ${github_app_pem_file_remote_key}
+        storage:
+          resourceGroup: ${storage_resource_group}
+          storageAccount: ${storage_account_name}
+          shareName: ${storage_share_name}
+          folderName: ${storage_folder_name}
+          server: ${storage_server}

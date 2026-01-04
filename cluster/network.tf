@@ -2,11 +2,29 @@ locals {
   address_space = ["192.168.224.0/27", "fd18:444d:4d4f::/48"]
 }
 
+data "tfe_outputs" "agent" {
+  workspace = "agent"
+}
+
 resource "azurerm_virtual_network" "main" {
   name                = module.naming.virtual_network.name
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   address_space       = local.address_space
+}
+
+resource "azurerm_virtual_network_peering" "agent" {
+  name                      = provider::azurerm::parse_resource_id(data.tfe_outputs.agent.values.virtual_network_id).resource_name
+  resource_group_name       = azurerm_resource_group.main.name
+  virtual_network_name      = azurerm_virtual_network.main.name
+  remote_virtual_network_id = data.tfe_outputs.agent.values.virtual_network_id
+}
+
+resource "azurerm_virtual_network_peering" "main" {
+  name                      = azurerm_virtual_network.main.name
+  resource_group_name       = provider::azurerm::parse_resource_id(data.tfe_outputs.agent.values.virtual_network_id).resource_group_name
+  virtual_network_name      = provider::azurerm::parse_resource_id(data.tfe_outputs.agent.values.virtual_network_id).resource_name
+  remote_virtual_network_id = azurerm_virtual_network.main.id
 }
 
 resource "azurerm_subnet" "api_server" {
@@ -42,6 +60,7 @@ resource "azurerm_subnet" "nodes" {
 
   service_endpoints = [
     "Microsoft.KeyVault",
+    "Microsoft.Storage",
   ]
 }
 
@@ -59,7 +78,7 @@ resource "azurerm_network_security_group" "main" {
     source_port_range          = "*"
     source_address_prefix      = "Internet"
     destination_address_prefix = "*"
-    destination_port_ranges    = ["80", "443"]
+    destination_port_ranges    = ["443"]
   }
 }
 
