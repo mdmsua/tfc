@@ -33,35 +33,28 @@ resource "tfe_workspace" "main" {
   }
 }
 
-module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.3"
-  suffix  = ["tfc", "gwc"]
-}
+data "azuread_client_config" "main" {}
 
-resource "azurerm_resource_group" "main" {
-  name     = module.naming.resource_group.name
-  location = var.location
-}
-
-resource "azurerm_user_assigned_identity" "main" {
+resource "azuread_application" "main" {
   for_each = local.workspaces
 
-  name                = "${module.naming.user_assigned_identity.name}-${each.key}"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
+  display_name = "hcp-terraform-workspace-${each.key}"
+  description  = "HCP Terraform workspace ${each.key} of the project ${data.tfe_project.main.name}"
+  owners       = [data.azuread_client_config.main.object_id]
 }
 
-data "azuread_application" "main" {
+resource "azuread_service_principal" "main" {
   for_each = local.workspaces
 
-  client_id = azurerm_user_assigned_identity.main[each.key].client_id
+  client_id   = azuread_application.main[each.key].client_id
+  description = azuread_application.main[each.key].description
+  owners      = [data.azuread_client_config.main.object_id]
 }
 
 resource "azuread_application_flexible_federated_identity_credential" "main" {
   for_each = local.workspaces
 
-  application_id             = data.azuread_application.main[each.key].id
+  application_id             = azuread_application.main[each.key].id
   claims_matching_expression = "claims['sub'] matches 'organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:*'"
   display_name               = "app.eu.terraform.io-${data.tfe_organization.main.name}-${data.tfe_project.main.name}-${each.key}"
   audience                   = "api://AzureADTokenExchange"
@@ -71,7 +64,7 @@ resource "azuread_application_flexible_federated_identity_credential" "main" {
 resource "azurerm_role_assignment" "main" {
   for_each = local.workspaces
 
-  principal_id         = azurerm_user_assigned_identity.main[each.key].principal_id
+  principal_id         = azuread_service_principal.main[each.key].object_id
   scope                = "/subscriptions/${data.azurerm_client_config.main.subscription_id}"
   role_definition_name = "Owner"
 }
@@ -116,7 +109,7 @@ resource "tfe_variable" "main" {
     }
   }
   key          = each.value.variable_key
-  value        = azurerm_user_assigned_identity.main[each.value.workspace_key].client_id
+  value        = azuread_application.main[each.value.workspace_key].client_id
   workspace_id = tfe_workspace.main[each.value.workspace_key].id
   category     = "env"
 }
@@ -126,6 +119,6 @@ module "assignment" {
 
   for_each = { for k, v in local.workspaces : k => v if contains(keys(v), "roles") }
 
-  principal_id = azurerm_user_assigned_identity.main[each.key].principal_id
+  principal_id = azuread_service_principal.main[each.key].object_id
   roles        = each.value.roles
 }

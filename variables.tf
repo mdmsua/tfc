@@ -12,8 +12,3 @@ variable "tfc_azure_dynamic_credentials" {
   })
 }
 
-variable "location" {
-  type        = string
-  description = "The Azure region where to create the resources."
-  default     = "germanywestcentral"
-}
