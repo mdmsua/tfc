@@ -57,19 +57,19 @@ spec:
                 data:
                   - secretKey: github_app_id
                     remoteRef:
-                      key: github-app-id
+                      key: {{ .Values.github.appIdRemoteKey }}
                       conversionStrategy: Default	
                       decodingStrategy: None
                       metadataPolicy: None
                   - secretKey: github_app_installation_id
                     remoteRef:
-                      key: github-app-installation-id
+                      key: {{ .Values.github.appInstallationIdRemoteKey }}
                       conversionStrategy: Default	
                       decodingStrategy: None
                       metadataPolicy: None
                   - secretKey: github_app_private_key
                     remoteRef:
-                      key: github-app-pem-file
+                      key: {{ .Values.github.appPemFileRemoteKey }}
                       conversionStrategy: Default	
                       decodingStrategy: None
                       metadataPolicy: None
@@ -81,7 +81,7 @@ spec:
       helm:
         releaseName: github
         valuesObject:
-          githubConfigUrl: https://github.com/mdmsua/tfc
+          githubConfigUrl: {{ .Values.github.repository }}
           githubConfigSecret: arc
           runnerScaleSetName: k8s
           controllerServiceAccount:
