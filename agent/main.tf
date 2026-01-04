@@ -27,12 +27,12 @@ resource "tfe_agent_token" "main" {
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~> 0.4.0"
-  suffix  = ["tfc", "gwc"]
+  suffix  = ["tfc", "sdc", "agent"]
 }
 
 resource "azurerm_resource_group" "main" {
   name     = module.naming.resource_group.name
-  location = "germanywestcentral"
+  location = "swedencentral"
 }
 
 resource "azurerm_virtual_network" "main" {
