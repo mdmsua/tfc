@@ -1,8 +1,6 @@
 terraform {
   required_version = "~> 1.0"
   cloud {
-    organization = "mdmsua"
-    hostname     = "app.eu.terraform.io"
     workspaces {
       name = "root"
     }
@@ -23,9 +21,7 @@ terraform {
   }
 }
 
-provider "tfe" {
-  organization = "mdmsua"
-}
+provider "tfe" {}
 
 provider "azurerm" {
   features {}
