@@ -11,16 +11,17 @@ resource "azurerm_role_assignment" "storage_key_vault_crypto_service_encryption_
 }
 
 resource "azurerm_storage_account" "main" {
-  name                            = module.naming.storage_account.name
-  resource_group_name             = azurerm_resource_group.main.name
-  location                        = azurerm_resource_group.main.location
-  account_tier                    = "Premium"
-  account_kind                    = "FileStorage"
-  account_replication_type        = "LRS"
-  https_traffic_only_enabled      = true
-  min_tls_version                 = "TLS1_2"
-  allow_nested_items_to_be_public = false
-  local_user_enabled              = false
+  name                              = module.naming.storage_account.name
+  resource_group_name               = azurerm_resource_group.main.name
+  location                          = azurerm_resource_group.main.location
+  account_tier                      = "Premium"
+  account_kind                      = "FileStorage"
+  account_replication_type          = "LRS"
+  https_traffic_only_enabled        = true
+  min_tls_version                   = "TLS1_2"
+  allow_nested_items_to_be_public   = false
+  local_user_enabled                = false
+  provisioned_billing_model_version = "V2"
 
   identity {
     type         = "UserAssigned"
@@ -51,5 +52,5 @@ resource "azurerm_storage_share" "main" {
 
 resource "azurerm_storage_share_directory" "github" {
   name             = "github"
-  storage_share_id = azurerm_storage_share.main.id
+  storage_share_id = azurerm_storage_share.main.url
 }
