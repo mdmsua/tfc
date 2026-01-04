@@ -49,6 +49,14 @@ resource "azurerm_subnet" "main" {
   address_prefixes                = azurerm_virtual_network.main.address_space
   default_outbound_access_enabled = false
   service_endpoints               = ["Microsoft.ContainerRegistry", "Microsoft.Storage", "Microsoft.KeyVault"]
+
+  delegation {
+    name = "Microsoft.ContainerInstance/containerGroups"
+    service_delegation {
+      name    = "Microsoft.ContainerInstance/containerGroups"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
 }
 
 resource "azurerm_user_assigned_identity" "main" {
