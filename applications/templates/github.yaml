@@ -93,20 +93,21 @@ spec:
            name: github-gha-rs-controller
           template:
             spec:
+              securityContext:
+                fsGroup: 123
+                runAsUser: 1001
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                   command: ["/home/runner/run.sh"]
-                  securityContext:
-                    runAsUser: 1001
                   env:
                     - name: ACTIONS_RUNNER_IMAGE
                       value: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                     - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
                       value: "false"
-                  volumeMounts:
-                    - name: temp
-                      mountPath: /usr/local/temp
-              volumes:
-                - name: temp
-                  emptyDir: {}
+              #     volumeMounts:
+              #       - name: temp
+              #         mountPath: /usr/local/temp
+              # volumes:
+              #   - name: temp
+              #     emptyDir: {}
