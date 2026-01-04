@@ -27,12 +27,28 @@ resource "tfe_agent_token" "main" {
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "~> 0.4.0"
-  suffix  = ["tfc", "gwc", "dev"]
+  suffix  = ["tfc", "gwc"]
 }
 
 resource "azurerm_resource_group" "main" {
   name     = module.naming.resource_group.name
   location = "germanywestcentral"
+}
+
+resource "azurerm_virtual_network" "main" {
+  name                = module.naming.virtual_network.name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  address_space       = ["192.168.255.248/29"]
+}
+
+resource "azurerm_subnet" "main" {
+  name                            = module.naming.subnet.name
+  resource_group_name             = azurerm_resource_group.main.name
+  virtual_network_name            = azurerm_virtual_network.main.name
+  address_prefixes                = azurerm_virtual_network.main.address_space
+  default_outbound_access_enabled = false
+  service_endpoints               = ["Microsoft.ContainerRegistry", "Microsoft.Storage", "Microsoft.KeyVault"]
 }
 
 resource "azurerm_user_assigned_identity" "main" {
@@ -75,8 +91,9 @@ resource "azurerm_container_group" "main" {
   location            = azurerm_resource_group.main.location
   sku                 = "Standard"
   os_type             = "Linux"
-  ip_address_type     = "Public"
+  ip_address_type     = "Private"
   restart_policy      = "Always"
+  subnet_ids          = [azurerm_subnet.main.id]
 
   identity {
     type         = "UserAssigned"
