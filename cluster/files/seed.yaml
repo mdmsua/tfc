@@ -36,3 +36,8 @@ spec:
           tenantId: ${oidc_tenant_id}
           clientId: ${oidc_client_id}
           groupId: ${oidc_group_id}
+        github:
+          repository: ${github_repository}
+          appIdRemoteKey: ${github_app_id_remote_key}
+          appInstallationIdRemoteKey: ${github_app_installation_id_remote_key}
+          appPemFileRemoteKey: ${github_app_pem_file_remote_key}

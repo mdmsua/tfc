@@ -41,20 +41,29 @@ resource "azurerm_key_vault_key" "cluster" {
   ]
 }
 
-resource "azurerm_key_vault_secret" "cloudflare_api_token" {
-  name         = "cloudflare-api-token"
-  key_vault_id = var.key_vault_id
-  value        = var.cloudflare_api_token
-
-  depends_on = [
-    azurerm_role_assignment.key_vault_secrets_officer
-  ]
+locals {
+  keys = {
+    cloudflare_api_token       = "cloudflare-api-token"
+    docker_hub_auth            = "docker-hub-auth"
+    github_app_id              = "github-app-id"
+    github_app_installation_id = "github-app-installation-id"
+    github_app_pem_file        = "github-app-pem-file"
+  }
+  secrets = {
+    (local.keys.cloudflare_api_token)       = var.cloudflare_api_token
+    (local.keys.docker_hub_auth)            = base64encode("${var.docker_hub_username}:${var.docker_hub_token}")
+    (local.keys.github_app_id)              = var.github_app_id
+    (local.keys.github_app_installation_id) = var.github_app_installation_id
+    (local.keys.github_app_pem_file)        = var.github_app_pem_file
+  }
 }
 
-resource "azurerm_key_vault_secret" "docker_hub_auth" {
-  name         = "docker-hub-auth"
+resource "azurerm_key_vault_secret" "main" {
+  for_each = local.secrets
+
+  name         = each.key
   key_vault_id = var.key_vault_id
-  value        = base64encode("${var.docker_hub_username}:${var.docker_hub_token}")
+  value        = each.value
 
   depends_on = [
     azurerm_role_assignment.key_vault_secrets_officer
