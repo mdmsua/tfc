@@ -14,7 +14,7 @@ resource "azurerm_storage_account" "main" {
   name                            = module.naming.storage_account.name
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
-  account_tier                    = "Standard"
+  account_tier                    = "Premium"
   account_kind                    = "FileStorage"
   account_replication_type        = "LRS"
   https_traffic_only_enabled      = true
@@ -24,6 +24,11 @@ resource "azurerm_storage_account" "main" {
   public_network_access_enabled   = false
   default_to_oauth_authentication = true
   local_user_enabled              = false
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.storage.id]
+  }
 
   network_rules {
     default_action = "Deny"
