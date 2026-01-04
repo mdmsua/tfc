@@ -93,6 +93,9 @@ spec:
            name: github-gha-rs-controller
           template:
             spec:
+              securityContext:
+                fsGroup: 123
+                runAsUser: 1001
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
