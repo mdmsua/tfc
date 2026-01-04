@@ -5,8 +5,6 @@ locals {
     "Microsoft.ContainerService" = ["EnableAPIServerVnetIntegrationPreview", "AzureOverlayDualStackPreview", "IMDSRestrictionPreview"]
     "Microsoft.Compute"          = ["EncryptionAtHost"]
   }
-
-  run_phases = toset(["plan", "apply"])
 }
 
 data "tfe_project" "main" {
@@ -16,15 +14,6 @@ data "tfe_project" "main" {
 data "tfe_organization" "main" {}
 
 data "azurerm_client_config" "main" {}
-
-resource "tfe_variable_set" "main" {
-  name = "Azure"
-}
-
-resource "tfe_project_variable_set" "main" {
-  project_id      = data.tfe_project.main.id
-  variable_set_id = tfe_variable_set.main.id
-}
 
 resource "tfe_workspace" "main" {
   for_each                       = local.workspaces
@@ -39,8 +28,8 @@ resource "tfe_workspace" "main" {
   trigger_patterns               = ["${lookup(each.value, "directory", each.key)}/**/*"]
 
   vcs_repo {
-    identifier                 = "mdmsua/tfc"
-    github_app_installation_id = "ghain-h96Ax4WhkEsc8N96"
+    identifier     = "mdmsua/tfc"
+    oauth_token_id = "ot-bNRuQwj94Fiuqg27"
   }
 }
 
@@ -56,29 +45,32 @@ resource "azurerm_resource_group" "main" {
 }
 
 resource "azurerm_user_assigned_identity" "main" {
-  for_each            = local.workspaces
+  for_each = local.workspaces
+
   name                = "${module.naming.user_assigned_identity.name}-${each.key}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 }
 
-resource "azurerm_federated_identity_credential" "main" {
-  for_each = { for pair in setproduct(keys(local.workspaces), tolist(local.run_phases)) :
-    "${pair[0]}-${pair[1]}" => {
-      workspace = pair[0]
-      phase     = pair[1]
-    }
-  }
-  name                = each.key
-  resource_group_name = azurerm_user_assigned_identity.main[each.value.workspace].resource_group_name
-  parent_id           = azurerm_user_assigned_identity.main[each.value.workspace].id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = "https://app.terraform.io"
-  subject             = "organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.value.workspace}:run_phase:${each.value.phase}"
+data "azuread_application" "main" {
+  for_each = local.workspaces
+
+  client_id = azurerm_user_assigned_identity.main[each.key].client_id
+}
+
+resource "azuread_application_flexible_federated_identity_credential" "main" {
+  for_each = local.workspaces
+
+  application_id             = data.azuread_application.main[each.key].id
+  claims_matching_expression = "claims['sub'] matches 'organization:${data.tfe_organization.main.name}:project:${data.tfe_project.main.name}:workspace:${each.key}:run_phase:*'"
+  display_name               = "app.eu.terraform.io-${data.tfe_organization.main.name}-${data.tfe_project.main.name}-${each.key}"
+  audience                   = "api://AzureADTokenExchange"
+  issuer                     = "https://app.eu.terraform.io"
 }
 
 resource "azurerm_role_assignment" "main" {
-  for_each             = local.workspaces
+  for_each = local.workspaces
+
   principal_id         = azurerm_user_assigned_identity.main[each.key].principal_id
   scope                = "/subscriptions/${data.azurerm_client_config.main.subscription_id}"
   role_definition_name = "Owner"
@@ -86,7 +78,8 @@ resource "azurerm_role_assignment" "main" {
 
 resource "azurerm_resource_provider_registration" "main" {
   for_each = local.resource_providers
-  name     = each.key
+
+  name = each.key
 
   dynamic "feature" {
     for_each = toset(each.value)
