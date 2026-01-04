@@ -13,7 +13,7 @@ env:
 jobs:
   image:
     name: Build and push ModSecurity image
-    runs-on: ubuntu-latest
+    runs-on: k8s
     permissions:
       contents: read
       id-token: write
