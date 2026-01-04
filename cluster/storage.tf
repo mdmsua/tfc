@@ -45,7 +45,7 @@ resource "azurerm_storage_account" "main" {
 resource "azurerm_storage_share" "main" {
   name               = "default"
   enabled_protocol   = "NFS"
-  quota              = 1
+  quota              = 100
   storage_account_id = azurerm_storage_account.main.id
 }
 
