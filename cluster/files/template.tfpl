@@ -1,4 +1,0 @@
-%{ for mirror in mirrors ~}
-OR
-@Request[Microsoft.ContainerRegistry/registries/repositories:name] StringStartsWithIgnoreCase '${mirror}/'
-%{ endfor ~}
