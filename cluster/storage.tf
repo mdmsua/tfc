@@ -17,12 +17,14 @@ resource "azurerm_storage_account" "main" {
   account_tier                      = "Premium"
   account_kind                      = "FileStorage"
   account_replication_type          = "LRS"
-  https_traffic_only_enabled        = true
   min_tls_version                   = "TLS1_2"
+  provisioned_billing_model_version = "V2"
+  https_traffic_only_enabled        = true
+  default_to_oauth_authentication   = true
+  infrastructure_encryption_enabled = true
+  shared_access_key_enabled         = false
   allow_nested_items_to_be_public   = false
   local_user_enabled                = false
-  provisioned_billing_model_version = "V2"
-  infrastructure_encryption_enabled = true
 
   identity {
     type         = "UserAssigned"
