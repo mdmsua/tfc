@@ -218,13 +218,6 @@ locals {
     SUBSCRIPTION_ID = data.azurerm_client_config.main.subscription_id
     REGISTRY        = azurerm_container_registry.main.login_server
   }
-  tfe_variables = {
-    container_registry_id      = azurerm_container_registry.main.id
-    container_registry_server  = azurerm_container_registry.main.login_server
-    container_registry_mirrors = join(",", keys(local.mirrors))
-    key_vault_id               = azurerm_key_vault.main.id
-    key_vault_uri              = azurerm_key_vault.main.vault_uri
-  }
 }
 
 resource "github_actions_variable" "main" {
@@ -233,17 +226,4 @@ resource "github_actions_variable" "main" {
   repository    = data.github_repository.main.name
   variable_name = each.key
   value         = each.value
-}
-
-data "tfe_variable_set" "azure" {
-  name = "Azure"
-}
-
-resource "tfe_variable" "azure" {
-  for_each = local.tfe_variables
-
-  category        = "terraform"
-  key             = each.key
-  value           = each.value
-  variable_set_id = data.tfe_variable_set.azure.id
 }
