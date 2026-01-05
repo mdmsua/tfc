@@ -51,7 +51,15 @@ resource "azurerm_storage_share" "main" {
   storage_account_id = azurerm_storage_account.main.id
 }
 
+resource "azurerm_role_assignment" "storage_file_data_privileged_contributor" {
+  role_definition_name = "Storage File Data Privileged Contributor"
+  principal_id         = data.azurerm_client_config.main.object_id
+  scope                = azurerm_storage_account.main.id
+}
+
 resource "azurerm_storage_share_directory" "main" {
   name             = module.naming.storage_share_directory.name
   storage_share_id = azurerm_storage_share.main.url
+
+  depends_on = [azurerm_role_assignment.storage_file_data_privileged_contributor]
 }
