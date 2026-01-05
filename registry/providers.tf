@@ -20,10 +20,8 @@ terraform {
 
   }
   cloud {
-    organization = "dmmo"
     workspaces {
-      name    = "acr"
-      project = "Azure"
+      name = "registry"
     }
   }
 }
@@ -32,9 +30,7 @@ provider "azurerm" {
   features {}
 }
 
-provider "tfe" {
-  organization = "dmmo"
-}
+provider "tfe" {}
 
 provider "azapi" {}
 

@@ -1,7 +1,6 @@
 terraform {
   required_version = "~> 1.0"
   cloud {
-    organization = "dmmo"
     workspaces {
       name = "agent"
     }
@@ -18,9 +17,7 @@ terraform {
   }
 }
 
-provider "tfe" {
-  organization = "dmmo"
-}
+provider "tfe" {}
 
 provider "azurerm" {
   features {}

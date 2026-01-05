@@ -43,7 +43,6 @@ terraform {
     }
   }
   cloud {
-    organization = "dmmo"
     workspaces {
       name = "cluster"
     }
@@ -66,9 +65,7 @@ provider "azurerm" {
   storage_use_azuread             = false
 }
 
-provider "tfe" {
-  organization = "dmmo"
-}
+provider "tfe" {}
 
 provider "azapi" {
   client_id_file_path  = var.tfc_azure_dynamic_credentials.default.client_id_file_path
