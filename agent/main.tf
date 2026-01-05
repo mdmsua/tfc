@@ -54,7 +54,7 @@ resource "azurerm_subnet" "main" {
     name = "Microsoft.ContainerInstance/containerGroups"
     service_delegation {
       name    = "Microsoft.ContainerInstance/containerGroups"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
     }
   }
 }
