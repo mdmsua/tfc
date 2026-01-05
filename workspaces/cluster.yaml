@@ -1,5 +1,5 @@
 agent: true
 roles:
   MicrosoftGraph:
-    - Application.ReadWrite.OwnedBy
+    - Application.ReadWrite.All
     - Group.ReadWrite.All
