@@ -20,7 +20,7 @@ resource "azurerm_key_vault" "main" {
 resource "azurerm_role_assignment" "key_vault_secrets_officer" {
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = data.azurerm_client_config.main.object_id
-  scope                = var.key_vault_id
+  scope                = local.key_vault_id
   principal_type       = "ServicePrincipal"
 }
 
@@ -84,7 +84,7 @@ resource "azurerm_key_vault_secret" "main" {
   for_each = local.secrets
 
   name         = each.key
-  key_vault_id = var.key_vault_id
+  key_vault_id = local.key_vault_id
   value        = each.value
 
   depends_on = [

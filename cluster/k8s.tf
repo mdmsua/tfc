@@ -101,7 +101,7 @@ resource "azurerm_federated_identity_credential" "external_secrets" {
 }
 
 resource "azurerm_role_assignment" "external_secrets" {
-  scope                = var.key_vault_id
+  scope                = local.key_vault_id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_user_assigned_identity.external_secrets.principal_id
 }
@@ -152,14 +152,14 @@ resource "kubernetes_secret_v1" "repository" {
 resource "kubectl_manifest" "seed" {
   yaml_body = templatefile("${path.module}/files/seed.yaml", {
     external_secrets_client_id            = azurerm_user_assigned_identity.external_secrets.client_id
-    key_vault_url                         = var.key_vault_uri
+    key_vault_url                         = local.key_vault_uri
     cloudflare_remote_key                 = local.keys.cloudflare_api_token
     github_app_id_remote_key              = local.keys.github_app_id
     github_app_installation_id_remote_key = local.keys.github_app_installation_id
     github_app_pem_file_remote_key        = local.keys.github_app_pem_file
     github_repository                     = data.github_repository.main.html_url
     domain                                = var.domain
-    registry                              = var.container_registry_server
+    registry                              = local.container_registry_server
     oidc_tenant_id                        = data.azurerm_client_config.main.tenant_id
     oidc_client_id                        = azuread_application.argocd.client_id
     oidc_group_id                         = azuread_group.argocd_admins.object_id

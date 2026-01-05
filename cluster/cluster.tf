@@ -156,6 +156,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     interval   = 1
     duration   = 24
     start_time = "00:00"
+    utc_offset = "+00:00"
   }
 
   maintenance_window_node_os {
@@ -163,6 +164,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     interval   = 1
     duration   = 24
     start_time = "00:00"
+    utc_offset = "+00:00"
   }
 
   lifecycle {
@@ -229,7 +231,7 @@ resource "azapi_update_resource" "preview_features" {
 }
 
 resource "azurerm_role_assignment" "kubelet_container_registry_repository_reader" {
-  scope                = var.container_registry_id
+  scope                = local.container_registry_id
   role_definition_name = "Container Registry Repository Reader"
   principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
   principal_type       = "ServicePrincipal"
@@ -244,7 +246,7 @@ resource "azurerm_role_assignment" "kubelet_container_registry_repository_reader
  OR 
  (
   @Request[Microsoft.ContainerRegistry/registries/repositories:name] StringEqualsIgnoreCase 'modsecurity'
-  ${templatefile("${path.module}/files/template.tfpl", { mirrors = split(",", var.container_registry_mirrors) })}
+  ${templatefile("${path.module}/files/template.tfpl", { mirrors = local.container_registry_mirrors })}
  )
 )
 EOF

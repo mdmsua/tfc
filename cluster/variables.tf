@@ -45,23 +45,12 @@ variable "domain" {
 variable "docker_hub_username" {
   description = "Docker hub username"
   type        = string
-  default     = "mdmsua"
 }
 
 variable "docker_hub_token" {
   description = "Docker hub token"
   type        = string
   sensitive   = true
-}
-
-variable "container_registry_server" {
-  description = "Container registry server"
-  type        = string
-}
-
-variable "container_registry_id" {
-  description = "Container registry ID"
-  type        = string
 }
 
 variable "github_app_id" {
@@ -82,20 +71,5 @@ variable "github_app_pem_file" {
 
 variable "github_owner" {
   description = "GitHub owner"
-  type        = string
-}
-
-variable "container_registry_mirrors" {
-  description = "Comma-separated list of container registry mirrors"
-  type        = string
-}
-
-variable "key_vault_id" {
-  description = "Key vault ID"
-  type        = string
-}
-
-variable "key_vault_uri" {
-  description = "Key vault URI"
   type        = string
 }
