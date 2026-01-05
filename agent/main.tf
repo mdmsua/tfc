@@ -125,6 +125,7 @@ resource "azurerm_container_group" "main" {
 
     environment_variables = {
       TFC_AGENT_NAME = "agent"
+      TFC_ADDRESS    = "https://app.eu.terraform.io"
     }
   }
 
