@@ -63,5 +63,12 @@ resource "azurerm_storage_share_directory" "main" {
   name             = module.naming.storage_share_directory.name
   storage_share_id = azurerm_storage_share.main.url
 
+  timeouts {
+    read   = "1m"
+    create = "1m"
+    delete = "1m"
+    update = "1m"
+  }
+
   depends_on = [azurerm_role_assignment.storage_file_data_privileged_contributor]
 }
