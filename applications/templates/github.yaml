@@ -125,8 +125,8 @@ spec:
                 mountOptions:
                   - dir_mode=0777
                   - file_mode=0777
-                  - uid=1000
-                  - gid=1000
+                  - uid=1001
+                  - gid=123
                   - mfsymlinks
                   - cache=strict
                   - nosharesock
@@ -155,7 +155,8 @@ spec:
           template:
             spec:
               securityContext:
-                fsGroup: 1000
+                runAsUser: 1001
+                fsGroup: 123
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
@@ -165,9 +166,3 @@ spec:
                       value: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                     - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
                       value: "false"
-              #     volumeMounts:
-              #       - name: tmp
-              #         mountPath: /tmp
-              # volumes:
-              #   - name: tmp
-              #     emptyDir: {}
