@@ -126,7 +126,7 @@ spec:
                   - dir_mode=0777
                   - file_mode=0777
                   - uid=1001
-                  - gid=123
+                  - gid=1001
                   - mfsymlinks
                   - cache=strict
                   - nosharesock
@@ -155,8 +155,7 @@ spec:
           template:
             spec:
               securityContext:
-                fsGroup: 123
-                fsGroupChangePolicy: Always
+                fsGroup: 1001
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
