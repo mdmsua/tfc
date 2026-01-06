@@ -125,8 +125,8 @@ spec:
                 mountOptions:
                   - dir_mode=0777
                   - file_mode=0777
-                  - uid=1001
-                  - gid=1001
+                  - uid=1000
+                  - gid=1000
                   - mfsymlinks
                   - cache=strict
                   - nosharesock
@@ -155,20 +155,11 @@ spec:
           template:
             spec:
               securityContext:
-                runAsUser: 1001
-                fsGroup: 123
-                fsGroupChangePolicy: OnRootMismatch
-                runAsNonRoot: true
+                fsGroup: 1000
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                   command: ["/home/runner/run.sh"]
-                  securityContext:
-                    allowPrivilegeEscalation: false
-                    privileged: false
-                    capabilities:
-                      drop:
-                        - ALL
                   env:
                     - name: ACTIONS_RUNNER_IMAGE
                       value: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
