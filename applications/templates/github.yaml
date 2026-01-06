@@ -156,8 +156,8 @@ spec:
             spec:
               securityContext:
                 runAsUser: 1001
-                runAsGroup: 1001
                 fsGroup: 123
+                fsGroupChangePolicy: OnRootMismatch
                 runAsNonRoot: true
               containers:
                 - name: runner
