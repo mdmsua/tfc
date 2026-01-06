@@ -48,3 +48,5 @@ spec:
           folderName: ${storage_folder_name}
           server: ${storage_server}
           volumeHandle: ${storage_volume_handle}
+          accountNameRemoteKey: ${storage_account_name_remote_key}
+          accountKeyRemoteKey: ${storage_account_key_remote_key}

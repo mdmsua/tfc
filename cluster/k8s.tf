@@ -169,6 +169,8 @@ resource "kubectl_manifest" "seed" {
     storage_folder_name                   = azurerm_storage_share_directory.main.name
     storage_server                        = azurerm_storage_account.main.primary_file_host
     storage_volume_handle                 = uuidv5("url", azurerm_storage_share.main.url)
+    storage_account_name_remote_key       = local.keys.storage_account_name
+    storage_account_key_remote_key        = local.keys.storage_account_key
   })
 
   depends_on = [helm_release.argocd]

@@ -70,6 +70,8 @@ locals {
     github_app_id              = "github-app-id"
     github_app_installation_id = "github-app-installation-id"
     github_app_pem_file        = "github-app-pem-file"
+    storage_account_name       = "storage-account-name"
+    storage_account_key        = "storage-account-key"
   }
   secrets = {
     (local.keys.cloudflare_api_token)       = var.cloudflare_api_token
@@ -77,6 +79,8 @@ locals {
     (local.keys.github_app_id)              = var.github_app_id
     (local.keys.github_app_installation_id) = var.github_app_installation_id
     (local.keys.github_app_pem_file)        = var.github_app_pem_file
+    (local.keys.storage_account_name)       = azurerm_storage_account.main.name
+    (local.keys.storage_account_key)        = azurerm_storage_account.main.primary_access_key
   }
 }
 

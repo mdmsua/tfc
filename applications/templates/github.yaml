@@ -76,6 +76,30 @@ spec:
                       metadataPolicy: None
                 refreshPolicy: Periodic
                 refreshInterval: 5m
+            - apiVersion: external-secrets.io/v1
+              kind: ExternalSecret
+              metadata:
+                name: storage
+                namespace: github-runners
+              spec:
+                secretStoreRef:
+                  name: {{ .Values.externalSecrets.secretStoreName }}
+                  kind: ClusterSecretStore
+                data:
+                  - secretKey: azurestorageaccountname
+                    remoteRef:
+                      key: {{ .Values.storage.accountNameRemoteKey }}
+                      conversionStrategy: Default	
+                      decodingStrategy: None
+                      metadataPolicy: None
+                  - secretKey: azurestorageaccountkey
+                    remoteRef:
+                      key: {{ .Values.storage.accountKeyRemoteKey }}
+                      conversionStrategy: Default	
+                      decodingStrategy: None
+                      metadataPolicy: None
+                refreshPolicy: Periodic
+                refreshInterval: 5m
             - apiVersion: v1
               kind: PersistentVolume
               metadata:
@@ -97,8 +121,7 @@ spec:
                     folderName: {{ .Values.storage.folderName }}
                     server: {{ .Values.storage.server }}
                     protocol: smb
-                    mountWithManagedIdentity: "true"
-                    clientID: {{ .Values.storage.clientId }}
+                    secretName: storage
                 mountOptions:
                   - dir_mode=0777
                   - file_mode=0777
