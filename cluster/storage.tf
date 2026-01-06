@@ -20,9 +20,7 @@ resource "azurerm_storage_account" "main" {
   min_tls_version                   = "TLS1_2"
   provisioned_billing_model_version = "V2"
   https_traffic_only_enabled        = true
-  default_to_oauth_authentication   = true
   infrastructure_encryption_enabled = true
-  shared_access_key_enabled         = false
   allow_nested_items_to_be_public   = false
   local_user_enabled                = false
 
@@ -48,7 +46,7 @@ resource "azurerm_storage_account" "main" {
 
 resource "azurerm_storage_share" "main" {
   name               = module.naming.storage_share.name
-  enabled_protocol   = "SMB"
+  enabled_protocol   = "NFS"
   quota              = 100
   storage_account_id = azurerm_storage_account.main.id
 }
@@ -64,10 +62,4 @@ resource "azurerm_storage_share_directory" "main" {
   storage_share_id = azurerm_storage_share.main.url
 
   depends_on = [azurerm_role_assignment.storage_file_data_privileged_contributor]
-}
-
-resource "azurerm_role_assignment" "kubelet_storage_file_data_smb_mi_admin" {
-  role_definition_name = "Storage File Data SMB MI Admin"
-  principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
-  scope                = azurerm_storage_account.main.id
 }

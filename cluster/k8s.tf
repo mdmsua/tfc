@@ -168,7 +168,6 @@ resource "kubectl_manifest" "seed" {
     storage_share_name                    = azurerm_storage_share.main.name
     storage_folder_name                   = azurerm_storage_share_directory.main.name
     storage_server                        = azurerm_storage_account.main.primary_file_host
-    storage_client_id                     = azurerm_user_assigned_identity.kubelet.client_id
     storage_volume_handle                 = uuidv5("url", azurerm_storage_share.main.url)
   })
 
