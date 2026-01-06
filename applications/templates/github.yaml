@@ -160,8 +160,6 @@ spec:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                   command: ["/home/runner/run.sh"]
-                  securityContext:
-                    privileged: true
                   env:
                     - name: ACTIONS_RUNNER_IMAGE
                       value: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
