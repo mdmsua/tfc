@@ -156,6 +156,7 @@ spec:
             spec:
               securityContext:
                 fsGroup: 123
+                fsGroupChangePolicy: Always
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
