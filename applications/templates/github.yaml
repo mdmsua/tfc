@@ -76,61 +76,6 @@ spec:
                       metadataPolicy: None
                 refreshPolicy: Periodic
                 refreshInterval: 5m
-            - apiVersion: external-secrets.io/v1
-              kind: ExternalSecret
-              metadata:
-                name: storage
-                namespace: github-runners
-              spec:
-                secretStoreRef:
-                  name: {{ .Values.externalSecrets.secretStoreName }}
-                  kind: ClusterSecretStore
-                data:
-                  - secretKey: azurestorageaccountname
-                    remoteRef:
-                      key: {{ .Values.storage.accountNameRemoteKey }}
-                      conversionStrategy: Default	
-                      decodingStrategy: None
-                      metadataPolicy: None
-                  - secretKey: azurestorageaccountkey
-                    remoteRef:
-                      key: {{ .Values.storage.accountKeyRemoteKey }}
-                      conversionStrategy: Default	
-                      decodingStrategy: None
-                      metadataPolicy: None
-                refreshPolicy: Periodic
-                refreshInterval: 5m
-            - apiVersion: v1
-              kind: PersistentVolume
-              metadata:
-                name: github
-              spec:
-                capacity:
-                  storage: 1Gi
-                accessModes:
-                  - ReadWriteMany
-                persistentVolumeReclaimPolicy: Retain
-                storageClassName: azurefile-csi-premium
-                csi:
-                  driver: file.csi.azure.com
-                  volumeHandle: {{ .Values.storage.volumeHandle }}
-                  volumeAttributes:
-                    resourceGroup: {{ .Values.storage.resourceGroup }}
-                    storageAccount: {{ .Values.storage.storageAccount }}
-                    shareName: {{ .Values.storage.shareName }}
-                    folderName: {{ .Values.storage.folderName }}
-                    server: {{ .Values.storage.server }}
-                    protocol: smb
-                    secretName: storage
-                mountOptions:
-                  - dir_mode=0777
-                  - file_mode=0777
-                  - uid=1001
-                  - gid=1001
-                  - mfsymlinks
-                  - cache=strict
-                  - nosharesock
-                  - nobrl
     - repoURL: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
       chart: gha-runner-scale-set
       targetRevision: 0.13.1
@@ -141,8 +86,6 @@ spec:
           githubConfigUrl: {{ .Values.github.repository }}
           githubConfigSecret: app
           runnerScaleSetName: k8s
-          containerMode:
-            type: dind
           controllerServiceAccount:
            namespace: github-system
            name: github-gha-rs-controller
