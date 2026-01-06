@@ -63,3 +63,9 @@ resource "azurerm_storage_share_directory" "main" {
 
   depends_on = [azurerm_role_assignment.storage_file_data_privileged_contributor]
 }
+
+resource "azurerm_role_assignment" "kubelet_storage_reader_and_data_access" {
+  role_definition_name = "Reader and Data Access"
+  principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
+  scope                = azurerm_storage_account.main.id
+}
