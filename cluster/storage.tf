@@ -48,7 +48,7 @@ resource "azurerm_storage_account" "main" {
 
 resource "azurerm_storage_share" "main" {
   name               = module.naming.storage_share.name
-  enabled_protocol   = "NFS"
+  enabled_protocol   = "SMB"
   quota              = 100
   storage_account_id = azurerm_storage_account.main.id
 }
