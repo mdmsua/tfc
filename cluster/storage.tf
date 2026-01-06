@@ -64,10 +64,10 @@ resource "azurerm_storage_share_directory" "main" {
   storage_share_id = azurerm_storage_share.main.url
 
   timeouts {
-    read   = "1m"
-    create = "1m"
-    delete = "1m"
-    update = "1m"
+    read   = "15m"
+    create = "15m"
+    delete = "15m"
+    update = "15m"
   }
 
   depends_on = [azurerm_role_assignment.storage_file_data_privileged_contributor]
