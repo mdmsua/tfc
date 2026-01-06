@@ -63,12 +63,11 @@ resource "azurerm_storage_share_directory" "main" {
   name             = module.naming.storage_share_directory.name
   storage_share_id = azurerm_storage_share.main.url
 
-  timeouts {
-    read   = "15m"
-    create = "15m"
-    delete = "15m"
-    update = "15m"
-  }
-
   depends_on = [azurerm_role_assignment.storage_file_data_privileged_contributor]
+}
+
+resource "azurerm_role_assignment" "kubelet_storage_file_data_smb_mi_admin" {
+  role_definition_name = "Storage File Data SMB MI Admin"
+  principal_id         = azurerm_user_assigned_identity.kubelet.principal_id
+  scope                = azurerm_storage_account.main.id
 }

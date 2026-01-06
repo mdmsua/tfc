@@ -47,3 +47,5 @@ spec:
           shareName: ${storage_share_name}
           folderName: ${storage_folder_name}
           server: ${storage_server}
+          clientId: ${storage_client_id}
+          volumeHandle: ${storage_volume_handle}
