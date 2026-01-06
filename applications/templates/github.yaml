@@ -76,38 +76,84 @@ spec:
                       metadataPolicy: None
                 refreshPolicy: Periodic
                 refreshInterval: 5m
+            - apiVersion: v1
+              kind: PersistentVolume
+              metadata:
+                name: github
+              spec:
+                capacity:
+                  storage: 1Gi
+                accessModes:
+                  - ReadWriteMany
+                persistentVolumeReclaimPolicy: Retain
+                storageClassName: azurefile-csi-premium
+                csi:
+                  driver: file.csi.azure.com
+                  volumeHandle: {{ .Values.storage.volumeHandle }}
+                  volumeAttributes:
+                    resourceGroup: {{ .Values.storage.resourceGroup }}
+                    storageAccount: {{ .Values.storage.storageAccount }}
+                    shareName: {{ .Values.storage.shareName }}
+                    folderName: {{ .Values.storage.folderName }}
+                    server: {{ .Values.storage.server }}
+                    protocol: smb
+                    mountWithManagedIdentity: "true"
+                    clientID: {{ .Values.storage.clientId }}
+                mountOptions:
+                  - dir_mode=0777
+                  - file_mode=0777
+                  - uid=1001
+                  - gid=1001
+                  - mfsymlinks
+                  - cache=strict
+                  - nosharesock
+                  - nobrl
     - repoURL: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
       chart: gha-runner-scale-set
       targetRevision: 0.13.1
       helm:
         releaseName: github
         valuesObject:
-          namespaceOverride: github-runners        
+          namespaceOverride: github-runners
           githubConfigUrl: {{ .Values.github.repository }}
           githubConfigSecret: app
           runnerScaleSetName: k8s
           containerMode:
-            type: kubernetes-novolume
+            type: kubernetes
+            kubernetesModeWorkVolumeClaim:
+              accessModes: ["ReadWriteMany"]
+              storageClassName: azurefile-csi-premium
+              resources:
+                requests:
+                  storage: 1Gi
           controllerServiceAccount:
            namespace: github-system
            name: github-gha-rs-controller
           template:
             spec:
               securityContext:
-                runAsUser: 0
-                runAsGroup: 0
+                runAsUser: 1001
+                runAsGroup: 1001
+                fsGroup: 123
+                runAsNonRoot: true
               containers:
                 - name: runner
                   image: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                   command: ["/home/runner/run.sh"]
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    privileged: false
+                    capabilities:
+                      drop:
+                        - ALL
                   env:
                     - name: ACTIONS_RUNNER_IMAGE
                       value: {{ .Values.registry }}/ghcr.io/actions/actions-runner:latest
                     - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
                       value: "false"
-                  volumeMounts:
-                    - name: tmp
-                      mountPath: /tmp
-              volumes:
-                - name: tmp
-                  emptyDir: {}
+              #     volumeMounts:
+              #       - name: tmp
+              #         mountPath: /tmp
+              # volumes:
+              #   - name: tmp
+              #     emptyDir: {}
